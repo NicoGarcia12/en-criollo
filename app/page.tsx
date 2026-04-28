@@ -13,8 +13,8 @@ export default function HomePage() {
       <header className="border-b border-border/60 bg-background/80 backdrop-blur sticky top-0 z-30">
         <div className="mx-auto max-w-5xl px-4 py-4 flex items-center justify-between gap-2">
           <div className="flex items-center gap-2">
-            <div className="size-8 rounded-md bg-primary text-primary-foreground flex items-center justify-center">
-              <Sparkles className="size-4" aria-hidden />
+            <div className="size-8 rounded-md bg-secondary border border-border flex items-center justify-center" style={{ boxShadow: "0 0 10px color-mix(in oklch, var(--neon) 30%, transparent)" }}>
+              <Sparkles className="size-4" aria-hidden style={{ color: "var(--neon)" }} />
             </div>
             <div className="leading-tight">
               <p className="font-semibold tracking-tight">EnCriollo</p>
@@ -35,11 +35,11 @@ export default function HomePage() {
 
       <section className="mx-auto max-w-3xl px-4 pt-12 pb-8 text-center">
         <span className="inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1 rounded-full bg-secondary text-secondary-foreground border border-border">
-          <span className="size-1.5 rounded-full bg-primary" />
+          <span className="size-1.5 rounded-full" style={{ background: "var(--neon)", boxShadow: "0 0 6px var(--neon)" }} />
           {t("app.badge")}
         </span>
         <h1 className="mt-4 text-pretty text-4xl md:text-5xl font-bold tracking-tight">
-          {t("app.title")} <span className="text-primary">{t("app.titleAccent")}</span>
+          {t("app.title")} <span style={{ color: "var(--neon)" }}>{t("app.titleAccent")}</span>
         </h1>
         <p className="mt-4 text-balance text-lg text-muted-foreground leading-relaxed">{t("app.subtitle")}</p>
 
