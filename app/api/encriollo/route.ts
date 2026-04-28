@@ -1,13 +1,10 @@
-import { generateText, Output, createProviderOptions } from "ai"
+import { generateText, Output } from "ai"
 import * as z from "zod"
 
 export const maxDuration = 30
 
-// Modelo fijo: AI Gateway de Vercel. Override opcional con env ENCRIOLLO_MODEL.
+// Modelo fijo: AI Gateway de Vercel. AI_GATEWAY_API_KEY se detecta automáticamente.
 const MODEL = process.env.ENCRIOLLO_MODEL ?? "openai/gpt-5-mini"
-
-// Usa VERCEL_TOKEN para autenticar con el AI Gateway
-const VERCEL_TOKEN = process.env.VERCEL_TOKEN
 
 const MAX_INPUT_CHARS = 8000
 
@@ -192,7 +189,6 @@ Instructions:
         system: SYSTEM_PROMPT,
         prompt: userPrompt,
         output: Output.object({ schema: understandSchema }),
-        headers: VERCEL_TOKEN ? { Authorization: `Bearer ${VERCEL_TOKEN}` } : undefined,
       })
 
       return Response.json({ mode: "entender", result: output })
@@ -243,7 +239,6 @@ Instructions:
         system: SYSTEM_PROMPT,
         prompt: userPrompt,
         output: Output.object({ schema: replySchema }),
-        headers: VERCEL_TOKEN ? { Authorization: `Bearer ${VERCEL_TOKEN}` } : undefined,
       })
 
       return Response.json({ mode: "responder", result: output })
