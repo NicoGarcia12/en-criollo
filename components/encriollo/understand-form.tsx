@@ -116,6 +116,7 @@ export function UnderstandForm({ onResult, onReset, hasResult }: Props) {
   }
 
   return (
+    <>
     <form id="understand-form" onSubmit={handleSubmit} className="space-y-5">
       <div className="space-y-2">
         <Label htmlFor="text" className="text-sm font-medium">
@@ -240,5 +241,6 @@ export function UnderstandForm({ onResult, onReset, hasResult }: Props) {
         </Button>
       )}
     </div>
+    </>
   )
 }
