@@ -3,6 +3,16 @@ import * as z from "zod"
 
 export const maxDuration = 30
 
+const DEFAULT_MODEL = "openai/gpt-5-mini"
+const MODEL_PATTERN = /^[\w-]+\/[\w.\-:]+$/
+
+function resolveModel(input: unknown): string {
+  if (typeof input === "string" && MODEL_PATTERN.test(input.trim())) {
+    return input.trim()
+  }
+  return DEFAULT_MODEL
+}
+
 const understandSchema = z.object({
   plainExplanation: z.string().describe("Una explicación corta y clara del texto en lenguaje simple"),
   keyPoints: z.array(z.string()).describe("Lista de puntos clave del texto"),
@@ -45,6 +55,8 @@ export async function POST(req: Request) {
       return Response.json({ error: "El texto está vacío" }, { status: 400 })
     }
 
+    const model = resolveModel(body.model)
+
     if (mode === "entender") {
       const { context = "general", simplicityLevel = "simple" } = body
 
@@ -66,7 +78,7 @@ Devolvé la respuesta con esta estructura:
 5. suggestedReply: Si el texto requiere contestar, proponé una respuesta breve y adecuada. Si no requiere respuesta, devolvé null.`
 
       const { output } = await generateText({
-        model: "openai/gpt-5-mini",
+        model,
         system: SYSTEM_PROMPT,
         prompt: userPrompt,
         output: Output.object({ schema: understandSchema }),
@@ -98,7 +110,7 @@ Devolvé la respuesta con esta estructura:
 6. whyItWorks: Una frase explicando por qué esa respuesta funciona.`
 
       const { output } = await generateText({
-        model: "openai/gpt-5-mini",
+        model,
         system: SYSTEM_PROMPT,
         prompt: userPrompt,
         output: Output.object({ schema: replySchema }),

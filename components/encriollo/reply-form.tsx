@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Sparkles, Loader2, RotateCcw } from "lucide-react"
+import { useModel } from "./model-context"
 import type { ReplyOutput } from "./types"
 
 const RELATIONSHIPS = [
@@ -42,6 +43,7 @@ export function ReplyForm({ onResult, onReset, hasResult }: Props) {
   const [userGoal, setUserGoal] = useState("")
   const [tone, setTone] = useState("amable")
   const [loading, setLoading] = useState(false)
+  const { model } = useModel()
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -60,6 +62,7 @@ export function ReplyForm({ onResult, onReset, hasResult }: Props) {
           relationship,
           userGoal: userGoal.trim() || "responder bien",
           tone,
+          model,
         }),
       })
       if (!res.ok) {

@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Sparkles, Loader2, RotateCcw } from "lucide-react"
+import { useModel } from "./model-context"
 import type { UnderstandOutput } from "./types"
 
 const CONTEXTS = [
@@ -36,6 +37,7 @@ export function UnderstandForm({ onResult, onReset, hasResult }: Props) {
   const [context, setContext] = useState("general")
   const [simplicityLevel, setSimplicityLevel] = useState("simple")
   const [loading, setLoading] = useState(false)
+  const { model } = useModel()
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -48,7 +50,7 @@ export function UnderstandForm({ onResult, onReset, hasResult }: Props) {
       const res = await fetch("/api/encriollo", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ mode: "entender", text, context, simplicityLevel }),
+        body: JSON.stringify({ mode: "entender", text, context, simplicityLevel, model }),
       })
       if (!res.ok) {
         const data = await res.json().catch(() => ({}))
