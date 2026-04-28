@@ -3,21 +3,8 @@ import * as z from "zod"
 
 export const maxDuration = 30
 
-// Debug: verificar qué variables de entorno están disponibles
-console.log("[v0] EnCriolloKey exists:", !!process.env.EnCriolloKey)
-console.log("[v0] AI_GATEWAY_API_KEY exists:", !!process.env.AI_GATEWAY_API_KEY)
-console.log("[v0] EnCriolloKey first 10 chars:", process.env.EnCriolloKey?.slice(0, 10) || "N/A")
-
-// Si EnCriolloKey está configurada, úsala como AI_GATEWAY_API_KEY
-if (process.env.EnCriolloKey && !process.env.AI_GATEWAY_API_KEY) {
-  process.env.AI_GATEWAY_API_KEY = process.env.EnCriolloKey
-  console.log("[v0] Mapped EnCriolloKey to AI_GATEWAY_API_KEY")
-}
-
-console.log("[v0] Final AI_GATEWAY_API_KEY exists:", !!process.env.AI_GATEWAY_API_KEY)
-
-// Modelo fijo: AI Gateway de Vercel. AI_GATEWAY_API_KEY se detecta automáticamente.
-const MODEL = process.env.ENCRIOLLO_MODEL ?? "openai/gpt-5-mini"
+// Usar OpenAI directamente. Si OPENAI_API_KEY no está, fallará con error claro.
+const MODEL = "gpt-4o-mini"
 
 const MAX_INPUT_CHARS = 8000
 
@@ -260,12 +247,10 @@ Instructions:
     return Response.json({ error: locale === "en" ? "Invalid mode" : "Modo no válido" }, { status: 400 })
   } catch (err) {
     const errorMessage = err instanceof Error ? err.message : String(err)
-    const errorName = err instanceof Error ? err.name : "Unknown"
-    console.error("[v0] EnCriollo API error:", errorName, errorMessage)
-    console.error("[v0] Full error:", JSON.stringify(err, Object.getOwnPropertyNames(err as object), 2))
+    console.error("[v0] EnCriollo API error:", errorMessage)
     return Response.json({ 
       error: "Algo salió mal procesando tu pedido",
-      debug: { name: errorName, message: errorMessage }
+      debug: errorMessage
     }, { status: 500 })
   }
 }
