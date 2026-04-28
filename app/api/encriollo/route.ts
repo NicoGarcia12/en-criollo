@@ -3,6 +3,11 @@ import * as z from "zod"
 
 export const maxDuration = 30
 
+// Si EnCriolloKey está configurada, úsala como AI_GATEWAY_API_KEY
+if (process.env.EnCriolloKey && !process.env.AI_GATEWAY_API_KEY) {
+  process.env.AI_GATEWAY_API_KEY = process.env.EnCriolloKey
+}
+
 // Modelo fijo: AI Gateway de Vercel. AI_GATEWAY_API_KEY se detecta automáticamente.
 const MODEL = process.env.ENCRIOLLO_MODEL ?? "openai/gpt-5-mini"
 
