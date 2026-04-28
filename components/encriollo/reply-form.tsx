@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { MessageSquareReply, Loader2, RotateCcw } from "lucide-react"
+import { Loader2, RotateCcw } from "lucide-react"
 import { useLocale } from "@/lib/i18n/locale-context"
 import { CharCounter, MAX_INPUT_CHARS } from "./char-counter"
 import { logEncriolloError } from "./error-logger"
@@ -135,7 +135,7 @@ export function ReplyForm({ onResult, onReset, hasResult }: Props) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-5">
+    <form id="reply-form" onSubmit={handleSubmit} className="space-y-5">
       <div className="space-y-2">
         <Label htmlFor="message" className="text-sm font-medium">
           {t("r.text.label")}
@@ -318,32 +318,28 @@ export function ReplyForm({ onResult, onReset, hasResult }: Props) {
         </div>
       </div>
 
-      <div className="flex flex-col sm:flex-row gap-2 pt-1">
-        <Button
-          type="submit"
-          disabled={loading || text.length > MAX_INPUT_CHARS}
-          size="lg"
-          className="gap-2"
-        >
-          {loading ? (
-            <>
-              <Loader2 className="size-4 animate-spin" aria-hidden />
-              {t("u.submit.loading")}
-            </>
-          ) : (
-            <>
-              <MessageSquareReply className="size-4" aria-hidden />
-              {t("r.submit")}
-            </>
-          )}
-        </Button>
-        {(text || userGoal || hasResult) && !loading && (
-          <Button type="button" variant="ghost" onClick={handleClear} className="gap-2">
-            <RotateCcw className="size-4" aria-hidden />
-            {t("r.clear")}
-          </Button>
-        )}
-      </div>
     </form>
+
+    <div className="flex flex-col items-center gap-2 pt-4">
+      <Button
+        type="submit"
+        form="reply-form"
+        disabled={loading || text.length > MAX_INPUT_CHARS}
+        size="lg"
+        className="w-full max-w-xs"
+      >
+        {loading ? (
+          <><Loader2 className="size-4 animate-spin mr-2" aria-hidden />{t("u.submit.loading")}</>
+        ) : (
+          t("r.submit")
+        )}
+      </Button>
+      {(text || userGoal || hasResult) && !loading && (
+        <Button type="button" variant="ghost" size="sm" onClick={handleClear} className="gap-1.5 text-muted-foreground">
+          <RotateCcw className="size-3.5" aria-hidden />
+          {t("r.clear")}
+        </Button>
+      )}
+    </div>
   )
 }
