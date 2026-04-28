@@ -5,34 +5,54 @@ import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
+import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Sparkles, Loader2, RotateCcw } from "lucide-react"
+import { useLocale } from "@/lib/i18n/locale-context"
+import { CharCounter, MAX_INPUT_CHARS } from "./char-counter"
+import { logEncriolloError } from "./error-logger"
 import type { UnderstandOutput } from "./types"
 
-const CONTEXTS = [
-  { value: "general", label: "General" },
-  { value: "laboral", label: "Laboral" },
-  { value: "legal", label: "Legal / contrato" },
-  { value: "medico", label: "Médico" },
-  { value: "financiero", label: "Financiero / banco" },
-  { value: "academico", label: "Académico / técnico" },
-  { value: "personal", label: "Personal" },
-]
+const SENDERS = [
+  "snd.unspecified",
+  "snd.bank",
+  "snd.lawyer",
+  "snd.hr",
+  "snd.gov",
+  "snd.platform",
+  "snd.medical",
+  "snd.school",
+  "snd.personal",
+  "snd.other",
+] as const
+
+const CONTEXT_KEYS = [
+  { value: "general", es: "General", en: "General" },
+  { value: "laboral", es: "Laboral", en: "Work" },
+  { value: "legal", es: "Legal / contrato", en: "Legal / contract" },
+  { value: "medico", es: "Médico", en: "Medical" },
+  { value: "financiero", es: "Financiero / banco", en: "Financial / bank" },
+  { value: "academico", es: "Académico / técnico", en: "Academic / technical" },
+  { value: "personal", es: "Personal", en: "Personal" },
+] as const
 
 const SIMPLICITY = [
-  { value: "muy-simple", label: "Como si tuviera 12 años" },
-  { value: "simple", label: "Simple y directo" },
-  { value: "estandar", label: "Estándar" },
-]
+  { value: "muy-simple", es: "Como si tuviera 12 años", en: "Like I'm 12" },
+  { value: "simple", es: "Simple y directo", en: "Simple and direct" },
+  { value: "estandar", es: "Estándar", en: "Standard" },
+] as const
 
 type Props = {
-  onResult: (r: UnderstandOutput) => void
+  onResult: (r: UnderstandOutput, inputPreview: string) => void
   onReset: () => void
   hasResult: boolean
 }
 
 export function UnderstandForm({ onResult, onReset, hasResult }: Props) {
+  const { t, locale } = useLocale()
   const [text, setText] = useState("")
+  const [senderType, setSenderType] = useState<(typeof SENDERS)[number]>("snd.unspecified")
+  const [objective, setObjective] = useState("")
   const [context, setContext] = useState("general")
   const [simplicityLevel, setSimplicityLevel] = useState("simple")
   const [loading, setLoading] = useState(false)
@@ -40,7 +60,11 @@ export function UnderstandForm({ onResult, onReset, hasResult }: Props) {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (!text.trim()) {
-      toast.error("Pegá un texto para empezar")
+      toast.error(t("u.error.empty"))
+      return
+    }
+    if (text.length > MAX_INPUT_CHARS) {
+      toast.error(t("common.charLimit", { n: MAX_INPUT_CHARS }))
       return
     }
     setLoading(true)
@@ -48,17 +72,36 @@ export function UnderstandForm({ onResult, onReset, hasResult }: Props) {
       const res = await fetch("/api/encriollo", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ mode: "entender", text, context, simplicityLevel }),
+        body: JSON.stringify({
+          mode: "entender",
+          text,
+          locale,
+          senderType,
+          objective,
+          context,
+          simplicityLevel,
+        }),
       })
       if (!res.ok) {
         const data = await res.json().catch(() => ({}))
-        throw new Error(data.error || "Error al procesar")
+        const msg = data.error || t("common.error.generic")
+        logEncriolloError({
+          mode: "entender",
+          inputLength: text.length,
+          errorLabel: msg,
+          locale,
+          status: res.status,
+        })
+        throw new Error(msg)
       }
       const data = await res.json()
-      onResult(data.result)
+      onResult(data.result, text.slice(0, 240))
     } catch (err) {
-      console.log("[v0] understand error:", err)
-      toast.error(err instanceof Error ? err.message : "Algo salió mal")
+      const label = err instanceof Error ? err.message : "unknown_error"
+      if (!(err instanceof Error && err.message)) {
+        logEncriolloError({ mode: "entender", inputLength: text.length, errorLabel: label, locale })
+      }
+      toast.error(err instanceof Error ? err.message : t("common.error.generic"))
     } finally {
       setLoading(false)
     }
@@ -66,6 +109,7 @@ export function UnderstandForm({ onResult, onReset, hasResult }: Props) {
 
   function handleClear() {
     setText("")
+    setObjective("")
     onReset()
   }
 
@@ -73,52 +117,52 @@ export function UnderstandForm({ onResult, onReset, hasResult }: Props) {
     <form onSubmit={handleSubmit} className="space-y-5">
       <div className="space-y-2">
         <Label htmlFor="text" className="text-sm font-medium">
-          Pegá el texto difícil
+          {t("u.text.label")}
         </Label>
         <Textarea
           id="text"
           value={text}
           onChange={(e) => setText(e.target.value)}
-          placeholder="Pegá acá el contrato, mail, carta del banco, mensaje legal o cualquier texto que no termines de entender…"
+          placeholder={t("u.text.placeholder")}
           className="min-h-40 resize-y bg-background"
           disabled={loading}
+          aria-invalid={text.length > MAX_INPUT_CHARS}
         />
-        <p className="text-xs text-muted-foreground">
-          {text.length > 0 ? `${text.length.toLocaleString("es")} caracteres` : "Cuanto más completo, mejor el análisis."}
-        </p>
+        <CharCounter value={text} hint={text.length === 0 ? t("u.text.hint") : undefined} />
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="space-y-2">
+          <Label htmlFor="sender" className="text-sm font-medium">
+            {t("u.sender.label")}
+          </Label>
+          <Select value={senderType} onValueChange={(v) => setSenderType(v as typeof senderType)} disabled={loading}>
+            <SelectTrigger id="sender" className="bg-background">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {SENDERS.map((s) => (
+                <SelectItem key={s} value={s}>
+                  {t(s)}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <p className="text-xs text-muted-foreground">{t("u.sender.help")}</p>
+        </div>
+
+        <div className="space-y-2">
           <Label htmlFor="context" className="text-sm font-medium">
-            Contexto
+            {t("u.context.label")}
           </Label>
           <Select value={context} onValueChange={setContext} disabled={loading}>
             <SelectTrigger id="context" className="bg-background">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              {CONTEXTS.map((c) => (
+              {CONTEXT_KEYS.map((c) => (
                 <SelectItem key={c.value} value={c.value}>
-                  {c.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="simplicity" className="text-sm font-medium">
-            Nivel de simpleza
-          </Label>
-          <Select value={simplicityLevel} onValueChange={setSimplicityLevel} disabled={loading}>
-            <SelectTrigger id="simplicity" className="bg-background">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {SIMPLICITY.map((s) => (
-                <SelectItem key={s.value} value={s.value}>
-                  {s.label}
+                  {locale === "en" ? c.en : c.es}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -126,24 +170,63 @@ export function UnderstandForm({ onResult, onReset, hasResult }: Props) {
         </div>
       </div>
 
+      <div className="space-y-2">
+        <Label htmlFor="objective" className="text-sm font-medium">
+          {t("u.objective.label")} <span className="text-muted-foreground font-normal">{t("common.optional")}</span>
+        </Label>
+        <Input
+          id="objective"
+          value={objective}
+          onChange={(e) => setObjective(e.target.value)}
+          placeholder={t("u.objective.placeholder")}
+          className="bg-background"
+          disabled={loading}
+          maxLength={500}
+        />
+        <p className="text-xs text-muted-foreground">{t("u.objective.help")}</p>
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="simplicity" className="text-sm font-medium">
+          {t("u.simplicity.label")}
+        </Label>
+        <Select value={simplicityLevel} onValueChange={setSimplicityLevel} disabled={loading}>
+          <SelectTrigger id="simplicity" className="bg-background">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {SIMPLICITY.map((s) => (
+              <SelectItem key={s.value} value={s.value}>
+                {locale === "en" ? s.en : s.es}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
       <div className="flex flex-col sm:flex-row gap-2 pt-1">
-        <Button type="submit" disabled={loading} size="lg" className="gap-2">
+        <Button
+          type="submit"
+          disabled={loading || text.length > MAX_INPUT_CHARS}
+          size="lg"
+          className="gap-2"
+        >
           {loading ? (
             <>
               <Loader2 className="size-4 animate-spin" aria-hidden />
-              Pensando…
+              {t("u.submit.loading")}
             </>
           ) : (
             <>
               <Sparkles className="size-4" aria-hidden />
-              Explicámelo en criollo
+              {t("u.submit")}
             </>
           )}
         </Button>
         {(text || hasResult) && !loading && (
           <Button type="button" variant="ghost" onClick={handleClear} className="gap-2">
             <RotateCcw className="size-4" aria-hidden />
-            Limpiar
+            {t("u.clear")}
           </Button>
         )}
       </div>

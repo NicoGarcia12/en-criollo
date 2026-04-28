@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 import { Plus_Jakarta_Sans, Geist_Mono } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
 import { Toaster } from "@/components/ui/sonner"
+import { LocaleProvider } from "@/lib/i18n/locale-context"
 import "./globals.css"
 
 const jakarta = Plus_Jakarta_Sans({
@@ -31,8 +32,10 @@ export default function RootLayout({
   return (
     <html lang="es" className={`${jakarta.variable} ${geistMono.variable} bg-background`}>
       <body className="font-sans antialiased">
-        {children}
-        <Toaster richColors position="top-center" />
+        <LocaleProvider>
+          {children}
+          <Toaster richColors position="top-center" />
+        </LocaleProvider>
         {process.env.NODE_ENV === "production" && <Analytics />}
       </body>
     </html>
