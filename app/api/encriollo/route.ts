@@ -5,7 +5,8 @@ import * as z from "zod"
 export const maxDuration = 30
 
 // Usar Groq directamente con tu API key (gratis y rápido)
-const model = groq("llama-3.1-70b-versatile")
+// Modelo: Llama 3.3 70B - el modelo más actual y potente disponible en Groq
+const model = groq("llama-3.3-70b-versatile")
 
 const MAX_INPUT_CHARS = 8000
 
