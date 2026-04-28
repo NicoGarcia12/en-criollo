@@ -1,10 +1,11 @@
 import { generateText, Output } from "ai"
+import { openai } from "@ai-sdk/openai"
 import * as z from "zod"
 
 export const maxDuration = 30
 
-// Usar OpenAI directamente. Si OPENAI_API_KEY no está, fallará con error claro.
-const MODEL = "gpt-4o-mini"
+// Usar OpenAI directamente con tu API key
+const model = openai("gpt-4o-mini")
 
 const MAX_INPUT_CHARS = 8000
 
@@ -185,7 +186,7 @@ Instructions:
 - If inputLanguage !== "${locale}", fill alternateSummary and alternateSuggestedReply (when there is a suggested reply) in the original language; set alternateLanguageLabel to the language name written in ${localeLabel}. Otherwise set those fields to null and needsBilingual=false.`
 
       const { output } = await generateText({
-        model: MODEL,
+        model,
         system: SYSTEM_PROMPT,
         prompt: userPrompt,
         output: Output.object({ schema: understandSchema }),
@@ -235,7 +236,7 @@ Instructions:
 - Never include "[your name]" or other placeholders. If signature is provided, use it; if not, close naturally without a placeholder.`
 
       const { output } = await generateText({
-        model: MODEL,
+        model,
         system: SYSTEM_PROMPT,
         prompt: userPrompt,
         output: Output.object({ schema: replySchema }),
