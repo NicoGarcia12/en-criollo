@@ -1,11 +1,11 @@
 import { generateText, Output } from "ai"
-import { openai } from "@ai-sdk/openai"
+import { groq } from "@ai-sdk/groq"
 import * as z from "zod"
 
 export const maxDuration = 30
 
-// Usar OpenAI directamente con tu API key
-const model = openai("gpt-4o-mini")
+// Usar Groq directamente con tu API key (gratis y rápido)
+const model = groq("mixtral-8x7b-32768")
 
 const MAX_INPUT_CHARS = 8000
 
