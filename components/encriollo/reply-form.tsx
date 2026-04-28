@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Sparkles, Loader2, RotateCcw } from "lucide-react"
+import { MessageSquareReply, Loader2, RotateCcw } from "lucide-react"
 import { useLocale } from "@/lib/i18n/locale-context"
 import { CharCounter, MAX_INPUT_CHARS } from "./char-counter"
 import { logEncriolloError } from "./error-logger"
@@ -319,7 +319,7 @@ export function ReplyForm({ onResult, onReset, hasResult }: Props) {
             </>
           ) : (
             <>
-              <Sparkles className="size-4" aria-hidden />
+              <MessageSquareReply className="size-4" aria-hidden />
               {t("r.submit")}
             </>
           )}

@@ -1,6 +1,6 @@
 "use client"
 
-import { Sparkles, MessageSquareReply, BookOpen } from "lucide-react"
+import { BrainCircuit, BookOpen, MessageSquareReply } from "lucide-react"
 import { EnCriolloApp } from "@/components/encriollo/encriollo-app"
 import { LocaleToggle } from "@/components/encriollo/locale-toggle"
 import { useLocale } from "@/lib/i18n/locale-context"
@@ -14,7 +14,7 @@ export default function HomePage() {
         <div className="mx-auto max-w-5xl px-4 py-4 flex items-center justify-between gap-2">
           <div className="flex items-center gap-2">
             <div className="size-8 rounded-md bg-secondary border border-border flex items-center justify-center" style={{ boxShadow: "0 0 10px color-mix(in oklch, var(--neon) 30%, transparent)" }}>
-              <Sparkles className="size-4" aria-hidden style={{ color: "var(--neon)" }} />
+              <BrainCircuit className="size-4" aria-hidden style={{ color: "var(--neon)" }} />
             </div>
             <div className="leading-tight">
               <p className="font-semibold tracking-tight">EnCriollo</p>
