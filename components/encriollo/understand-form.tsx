@@ -52,6 +52,7 @@ export function UnderstandForm({ onResult, onReset, hasResult }: Props) {
   const { t, locale } = useLocale()
   const [text, setText] = useState("")
   const [senderType, setSenderType] = useState<(typeof SENDERS)[number]>("snd.unspecified")
+  const [senderOther, setSenderOther] = useState("")
   const [objective, setObjective] = useState("")
   const [context, setContext] = useState("general")
   const [simplicityLevel, setSimplicityLevel] = useState("simple")
@@ -77,6 +78,7 @@ export function UnderstandForm({ onResult, onReset, hasResult }: Props) {
           text,
           locale,
           senderType,
+          senderOther: senderType === "snd.other" ? senderOther : undefined,
           objective,
           context,
           simplicityLevel,
@@ -148,6 +150,17 @@ export function UnderstandForm({ onResult, onReset, hasResult }: Props) {
               ))}
             </SelectContent>
           </Select>
+          {senderType === "snd.other" && (
+            <Input
+              value={senderOther}
+              onChange={(e) => setSenderOther(e.target.value)}
+              placeholder={t("u.sender.other.placeholder")}
+              className="bg-background mt-1"
+              disabled={loading}
+              maxLength={120}
+              aria-label={t("u.sender.other.label")}
+            />
+          )}
           <p className="text-xs text-muted-foreground">{t("u.sender.help")}</p>
         </div>
 

@@ -57,6 +57,7 @@ export function ReplyForm({ onResult, onReset, hasResult }: Props) {
   const { t, locale } = useLocale()
   const [text, setText] = useState("")
   const [relationship, setRelationship] = useState("trabajo")
+  const [relationshipOther, setRelationshipOther] = useState("")
   const [userGoal, setUserGoal] = useState("")
   const [tone, setTone] = useState("amable")
   const [length, setLength] = useState("medium")
@@ -87,6 +88,7 @@ export function ReplyForm({ onResult, onReset, hasResult }: Props) {
           text,
           locale,
           relationship,
+          relationshipOther: relationship === "otro" ? relationshipOther : undefined,
           userGoal: userGoal.trim() || (locale === "en" ? "respond well" : "responder bien"),
           tone,
           length,
@@ -167,6 +169,17 @@ export function ReplyForm({ onResult, onReset, hasResult }: Props) {
               ))}
             </SelectContent>
           </Select>
+          {relationship === "otro" && (
+            <Input
+              value={relationshipOther}
+              onChange={(e) => setRelationshipOther(e.target.value)}
+              placeholder={t("r.relationship.other.placeholder")}
+              className="bg-background mt-1"
+              disabled={loading}
+              maxLength={120}
+              aria-label={t("r.relationship.other.label")}
+            />
+          )}
         </div>
 
         <div className="space-y-2">
