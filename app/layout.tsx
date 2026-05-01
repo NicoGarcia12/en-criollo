@@ -18,10 +18,14 @@ const geistMono = Geist_Mono({
 })
 
 export const metadata: Metadata = {
-  title: "EnCriollo — Entendé lo importante. Respondé mejor.",
+  title: "EnCriollo",
   description:
     "Pegá un texto difícil y te decimos qué significa, qué importa y qué hacer. O pegá un mensaje incómodo y te ayudamos a responder claro y sin quedar mal.",
-  generator: "v0.app",
+  icons: {
+    icon: "/gaucho-icon.svg",
+    shortcut: "/gaucho-icon.svg",
+    apple: "/gaucho-icon.svg",
+  },
 }
 
 export default function RootLayout({

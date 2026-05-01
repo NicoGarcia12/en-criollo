@@ -14,10 +14,10 @@ export default function HomePage() {
         <div className="mx-auto flex max-w-3xl items-center justify-between gap-2 px-4 py-4">
           <div className="flex items-center gap-2">
             <Image
-              src="/logo-gaucho-head.jpg"
+              src="/gaucho-icon.svg"
               alt="EnCriollo"
-              width={56}
-              height={56}
+              width={52}
+              height={52}
               className="rounded-lg"
               priority
             />
@@ -45,12 +45,7 @@ export default function HomePage() {
 
       <footer className="border-border/60 border-t">
         <div className="text-muted-foreground mx-auto flex max-w-3xl flex-col gap-4 px-4 py-6 text-xs sm:flex-row sm:items-center sm:justify-between">
-          <p>
-            <span style={{ color: "var(--neon)" }}>EnCriollo</span>
-            {t("footer.disclaimer").startsWith("EnCriollo")
-              ? " " + t("footer.disclaimer").slice(10)
-              : " " + t("footer.disclaimer")}
-          </p>
+          <p>{t("footer.disclaimer")}</p>
           <p>{t("footer.made")}</p>
         </div>
       </footer>

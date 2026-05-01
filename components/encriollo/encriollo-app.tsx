@@ -26,7 +26,7 @@ export function EnCriolloApp() {
 
   return (
     <div
-      className="border-border bg-card relative rounded-xl border-2 shadow-sm"
+      className="border-border bg-card rounded-xl border-2 shadow-sm"
       style={{ borderColor: "color-mix(in oklch, var(--neon) 15%, var(--border))" }}
     >
       <div className="p-4 sm:p-6">
@@ -38,7 +38,8 @@ export function EnCriolloApp() {
           initialValues={selectedEntry ?? undefined}
         />
       </div>
-      <div className="absolute right-4 bottom-4">
+      {/* Footer del card: historial alineado a la derecha, separado del form */}
+      <div className="border-border/50 flex justify-end border-t px-4 py-3 sm:px-6">
         <HistoryPanel items={items} onSelect={handleSelect} onRemove={remove} onClear={clear} />
       </div>
     </div>

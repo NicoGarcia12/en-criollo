@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
+  <!-- Fondo circular -->
+  <circle cx="50" cy="50" r="50" fill="#0a0a0a"/>
+
+  <!-- Sombrero gaucho argentino: ala ancha y baja, copa baja (no el cono de mariachi) -->
+  <!-- Ala del sombrero -->
+  <ellipse cx="50" cy="34" rx="30" ry="5.5" fill="#3a2a10"/>
+  <!-- Copa del sombrero (baja y ancha, estilo pampa) -->
+  <rect x="31" y="17" width="38" height="18" rx="4" ry="4" fill="#4a3418"/>
+  <!-- Cinta del sombrero -->
+  <rect x="31" y="31" width="38" height="4" rx="1" fill="#1a1a1a"/>
+  <!-- Detalle verde en la cinta -->
+  <rect x="31" y="32" width="38" height="2" rx="1" fill="#22c55e"/>
+
+  <!-- Cara -->
+  <ellipse cx="50" cy="52" rx="17" ry="19" fill="#c8956c"/>
+
+  <!-- Bigote gaucho -->
+  <path d="M40 57 Q50 61 60 57" stroke="#3a2a10" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <path d="M40 57 Q44 59 50 57" stroke="#3a2a10" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <path d="M60 57 Q56 59 50 57" stroke="#3a2a10" stroke-width="2" fill="none" stroke-linecap="round"/>
+
+  <!-- Ojos -->
+  <ellipse cx="43" cy="49" rx="3" ry="3.5" fill="#1a1a1a"/>
+  <ellipse cx="57" cy="49" rx="3" ry="3.5" fill="#1a1a1a"/>
+  <!-- Brillo ojos -->
+  <circle cx="44.5" cy="47.5" r="1" fill="white"/>
+  <circle cx="58.5" cy="47.5" r="1" fill="white"/>
+
+  <!-- Nariz -->
+  <ellipse cx="50" cy="54" rx="3" ry="2" fill="#b07a52"/>
+
+  <!-- Pañuelo al cuello (rojo, estilo gaucho) -->
+  <path d="M33 69 Q50 75 67 69 L62 82 Q50 90 38 82 Z" fill="#dc2626"/>
+  <!-- Nudo del pañuelo -->
+  <circle cx="50" cy="71" r="4" fill="#b91c1c"/>
+
+  <!-- Cuello / hombros -->
+  <path d="M33 68 Q40 64 50 66 Q60 64 67 68 L70 85 Q50 92 30 85 Z" fill="#c8956c"/>
+</svg>
