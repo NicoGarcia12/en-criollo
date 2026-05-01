@@ -60,7 +60,7 @@ export function UnifiedForm({ onHistoryChange }: UnifiedFormProps) {
   const [senderOther, setSenderOther] = useState("")
 
   // Campos modo "entender"
-  const [simplicity, setSimplicity] = useState<(typeof SIMPLICITY)[number]>("simple")
+  const [simplicity, setSimplicity] = useState<(typeof SIMPLICITY)[number] | "">("")
   const [objective, setObjective] = useState("")
 
   // Campos modo "responder"
@@ -75,7 +75,7 @@ export function UnifiedForm({ onHistoryChange }: UnifiedFormProps) {
   const [loading, setLoading] = useState(false)
   const [result, setResult] = useState<UnifiedOutput | null>(null)
 
-  const canSubmit = text.trim().length > 0 && mode !== "" && text.length <= MAX_INPUT_CHARS
+  const canSubmit = text.trim().length > 0 && mode !== "" && (mode === "reply" || simplicity !== "") && text.length <= MAX_INPUT_CHARS
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
