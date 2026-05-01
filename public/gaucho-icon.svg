@@ -1,40 +1,77 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
-  <!-- Fondo circular -->
-  <circle cx="50" cy="50" r="50" fill="#0a0a0a"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 220" width="200" height="220">
 
-  <!-- Sombrero gaucho argentino: ala ancha y baja, copa baja (no el cono de mariachi) -->
-  <!-- Ala del sombrero -->
-  <ellipse cx="50" cy="34" rx="30" ry="5.5" fill="#3a2a10"/>
-  <!-- Copa del sombrero (baja y ancha, estilo pampa) -->
-  <rect x="31" y="17" width="38" height="18" rx="4" ry="4" fill="#4a3418"/>
+  <!-- === SOMBRERO === -->
+  <!-- Copa: trapezoide cuadrado, laterales casi rectos -->
+  <path d="M62 74 L65 40 L135 40 L138 74"
+        fill="none" stroke="#22c55e" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Techo con leve hundimiento central -->
+  <path d="M65 40 Q100 35 135 40"
+        fill="none" stroke="#22c55e" stroke-width="3.5" stroke-linecap="round"/>
   <!-- Cinta del sombrero -->
-  <rect x="31" y="31" width="38" height="4" rx="1" fill="#1a1a1a"/>
-  <!-- Detalle verde en la cinta -->
-  <rect x="31" y="32" width="38" height="2" rx="1" fill="#22c55e"/>
+  <path d="M63 67 Q100 70 137 67"
+        fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round"/>
+  <!-- Ala: ancha, casi horizontal, extremos con leve caída -->
+  <path d="M14 72 Q32 63 62 74 Q100 79 138 74 Q168 63 186 72 Q180 86 155 82 Q100 87 45 82 Q20 86 14 72Z"
+        fill="none" stroke="#22c55e" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
 
-  <!-- Cara -->
-  <ellipse cx="50" cy="52" rx="17" ry="19" fill="#c8956c"/>
+  <!-- === CARA === -->
+  <!-- Óvalo cara: bien proporcionado -->
+  <ellipse cx="100" cy="122" rx="31" ry="34" fill="none" stroke="#22c55e" stroke-width="3.5"/>
 
-  <!-- Bigote gaucho -->
-  <path d="M40 57 Q50 61 60 57" stroke="#3a2a10" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-  <path d="M40 57 Q44 59 50 57" stroke="#3a2a10" stroke-width="2" fill="none" stroke-linecap="round"/>
-  <path d="M60 57 Q56 59 50 57" stroke="#3a2a10" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <!-- Cejas: rectas y gruesas, expresión seria, fruncidas hacia el centro -->
+  <path d="M76 106 Q85 101 94 104" fill="none" stroke="#22c55e" stroke-width="4.5" stroke-linecap="round"/>
+  <path d="M106 104 Q115 101 124 106" fill="none" stroke="#22c55e" stroke-width="4.5" stroke-linecap="round"/>
 
-  <!-- Ojos -->
-  <ellipse cx="43" cy="49" rx="3" ry="3.5" fill="#1a1a1a"/>
-  <ellipse cx="57" cy="49" rx="3" ry="3.5" fill="#1a1a1a"/>
-  <!-- Brillo ojos -->
-  <circle cx="44.5" cy="47.5" r="1" fill="white"/>
-  <circle cx="58.5" cy="47.5" r="1" fill="white"/>
+  <!-- Ojos: almendras -->
+  <path d="M76 113 Q85 108 94 113 Q85 118 76 113Z"
+        fill="none" stroke="#22c55e" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M106 113 Q115 108 124 113 Q115 118 106 113Z"
+        fill="none" stroke="#22c55e" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Pupilas -->
+  <circle cx="85" cy="113" r="2.8" fill="#22c55e"/>
+  <circle cx="115" cy="113" r="2.8" fill="#22c55e"/>
 
-  <!-- Nariz -->
-  <ellipse cx="50" cy="54" rx="3" ry="2" fill="#b07a52"/>
+  <!-- Nariz: forma triangular simple -->
+  <path d="M95 120 L93 131 Q100 134 107 131 L105 120"
+        fill="none" stroke="#22c55e" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
 
-  <!-- Pañuelo al cuello (rojo, estilo gaucho) -->
-  <path d="M33 69 Q50 75 67 69 L62 82 Q50 90 38 82 Z" fill="#dc2626"/>
-  <!-- Nudo del pañuelo -->
-  <circle cx="50" cy="71" r="4" fill="#b91c1c"/>
+  <!-- BIGOTE GAUCHO: manubrio — líneas que suben hacia afuera desde el centro
+       Centro abajo (100,140), extremos arriba (62,118) y (138,118) -->
+  <!-- Mitad izq: sube hacia la izquierda, con pequeño rulo al final -->
+  <path d="M100 140 L68 120 Q62 116 58 120"
+        fill="none" stroke="#22c55e" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Mitad der: espejo -->
+  <path d="M100 140 L132 120 Q138 116 142 120"
+        fill="none" stroke="#22c55e" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
 
-  <!-- Cuello / hombros -->
-  <path d="M33 68 Q40 64 50 66 Q60 64 67 68 L70 85 Q50 92 30 85 Z" fill="#c8956c"/>
+  <!-- Boca debajo del bigote -->
+  <path d="M90 146 Q100 150 110 146"
+        fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round"/>
+
+  <!-- Barbilla / barba corta -->
+  <path d="M88 152 Q100 158 112 152"
+        fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round"/>
+
+  <!-- === PAÑUELO EN V === -->
+  <!-- Cuello: dos líneas laterales -->
+  <path d="M74 154 L70 162" fill="none" stroke="#22c55e" stroke-width="3" stroke-linecap="round"/>
+  <path d="M126 154 L130 162" fill="none" stroke="#22c55e" stroke-width="3" stroke-linecap="round"/>
+  <!-- Borde superior del pañuelo -->
+  <path d="M68 162 Q100 157 132 162"
+        fill="none" stroke="#22c55e" stroke-width="3" stroke-linecap="round"/>
+  <!-- V del pañuelo: grande y presencia -->
+  <path d="M60 168 L100 200 L140 168"
+        fill="none" stroke="#22c55e" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Solapa encimada -->
+  <path d="M60 168 Q80 165 100 168 Q120 165 140 168"
+        fill="none" stroke="#22c55e" stroke-width="3" stroke-linecap="round"/>
+  <!-- Nudo central prominente -->
+  <path d="M93 168 Q100 175 107 168"
+        fill="none" stroke="#22c55e" stroke-width="3.5" stroke-linecap="round"/>
+  <!-- Pliegues laterales -->
+  <path d="M62 172 Q68 184 73 196"
+        fill="none" stroke="#22c55e" stroke-width="2" stroke-linecap="round"/>
+  <path d="M138 172 Q132 184 127 196"
+        fill="none" stroke="#22c55e" stroke-width="2" stroke-linecap="round"/>
+
 </svg>
