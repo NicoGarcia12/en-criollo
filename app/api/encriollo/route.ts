@@ -70,13 +70,19 @@ export async function POST(req: Request) {
     }
     if (text.length > MAX_INPUT_CHARS) {
       return Response.json(
-        { error: locale === "en" ? `Max ${MAX_INPUT_CHARS} chars` : `Máximo ${MAX_INPUT_CHARS} caracteres` },
+        {
+          error:
+            locale === "en"
+              ? `Max ${MAX_INPUT_CHARS} chars`
+              : `Máximo ${MAX_INPUT_CHARS} caracteres`,
+        },
         { status: 400 },
       )
     }
 
     const localeLabel = localeName(locale)
-    const senderLabel = sender === "sender.other" ? senderOther : sender?.replace("sender.", "") || "unknown"
+    const senderLabel =
+      sender === "sender.other" ? senderOther : sender?.replace("sender.", "") || "unknown"
 
     if (mode === "understand") {
       const { simplicity = "simple", objective } = body

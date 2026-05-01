@@ -9,9 +9,9 @@ export default function HomePage() {
   const { t } = useLocale()
 
   return (
-    <main className="min-h-screen bg-background">
-      <header className="border-b border-border/60 bg-background/80 backdrop-blur sticky top-0 z-30">
-        <div className="mx-auto max-w-3xl px-4 py-4 flex items-center justify-between gap-2">
+    <main className="bg-background min-h-screen">
+      <header className="border-border/60 bg-background/80 sticky top-0 z-30 border-b backdrop-blur">
+        <div className="mx-auto flex max-w-3xl items-center justify-between gap-2 px-4 py-4">
           <div className="flex items-center gap-2">
             <Image
               src="/logo-gaucho-head.jpg"
@@ -23,7 +23,7 @@ export default function HomePage() {
             />
             <div className="leading-tight">
               <p className="font-semibold tracking-tight">EnCriollo</p>
-              <p className="text-xs text-muted-foreground">{t("app.tagline")}</p>
+              <p className="text-muted-foreground text-xs">{t("app.tagline")}</p>
             </div>
           </div>
           <LocaleToggle />
@@ -31,10 +31,10 @@ export default function HomePage() {
       </header>
 
       <section className="mx-auto max-w-3xl px-4 pt-10 pb-6 text-center">
-        <h1 className="text-pretty text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight">
+        <h1 className="text-3xl font-bold tracking-tight text-pretty sm:text-4xl md:text-5xl">
           {t("app.title")} <span style={{ color: "var(--neon)" }}>{t("app.titleAccent")}</span>
         </h1>
-        <p className="mt-4 text-balance text-base sm:text-lg text-muted-foreground leading-relaxed max-w-xl mx-auto">
+        <p className="text-muted-foreground mx-auto mt-4 max-w-xl text-base leading-relaxed text-balance sm:text-lg">
           {t("app.subtitle")}
         </p>
       </section>
@@ -43,8 +43,8 @@ export default function HomePage() {
         <EnCriolloApp />
       </section>
 
-      <footer className="border-t border-border/60">
-        <div className="mx-auto max-w-3xl px-4 py-6 text-xs text-muted-foreground flex flex-col sm:flex-row gap-4 sm:items-center sm:justify-between">
+      <footer className="border-border/60 border-t">
+        <div className="text-muted-foreground mx-auto flex max-w-3xl flex-col gap-4 px-4 py-6 text-xs sm:flex-row sm:items-center sm:justify-between">
           <p>
             <span style={{ color: "var(--neon)" }}>EnCriollo</span>
             {t("footer.disclaimer").startsWith("EnCriollo")
