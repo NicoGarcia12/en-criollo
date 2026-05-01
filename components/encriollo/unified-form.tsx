@@ -20,7 +20,7 @@ import { logEncriolloError } from "./error-logger"
 import { addToHistory } from "./history-store"
 import type { UnifiedOutput } from "./types"
 
-const MAX_INPUT_CHARS = 8000
+const MAX_INPUT_CHARS = 8000 // limit
 
 // Opciones de remitente (para ambos modos)
 const SENDERS = [
