@@ -192,6 +192,6 @@ Instructions:
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err)
     console.error("[v0] API error:", msg)
-    return Response.json({ error: "Algo salió mal", debug: msg }, { status: 500 })
+    return Response.json({ error: "Algo salió mal al procesar tu pedido" }, { status: 500 })
   }
 }

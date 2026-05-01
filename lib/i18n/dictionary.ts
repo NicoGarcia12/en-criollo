@@ -98,6 +98,9 @@ export const DICT = {
     "common.copy": "Copiar",
     "common.copied": "Copiado",
     "common.error.generic": "No se pudo copiar",
+    "common.error.network": "No pudimos conectarnos. Revisá tu conexión e intentá de nuevo.",
+    "common.error.server": "Algo salió mal al procesar tu pedido.",
+    "common.error.invalidResponse": "La respuesta del servidor llegó en un formato inválido.",
     "locale.label": "Idioma",
   },
   en: {
@@ -195,6 +198,9 @@ export const DICT = {
     "common.copy": "Copy",
     "common.copied": "Copied",
     "common.error.generic": "Could not copy",
+    "common.error.network": "We couldn't connect. Check your connection and try again.",
+    "common.error.server": "Something went wrong while processing your request.",
+    "common.error.invalidResponse": "The server response came in an invalid format.",
     "locale.label": "Language",
   },
 } as const

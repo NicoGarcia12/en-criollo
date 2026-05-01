@@ -14,7 +14,7 @@ export default function HomePage() {
         <div className="mx-auto flex max-w-3xl items-center justify-between gap-2 px-4 py-4">
           <div className="flex items-center gap-2">
             <Image
-              src="/gaucho-icon.svg"
+              src="/gaucho-logo-final.png"
               alt="EnCriollo"
               width={52}
               height={52}

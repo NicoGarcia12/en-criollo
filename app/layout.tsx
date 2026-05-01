@@ -22,9 +22,9 @@ export const metadata: Metadata = {
   description:
     "Pegá un texto difícil y te decimos qué significa, qué importa y qué hacer. O pegá un mensaje incómodo y te ayudamos a responder claro y sin quedar mal.",
   icons: {
-    icon: "/gaucho-icon.svg",
-    shortcut: "/gaucho-icon.svg",
-    apple: "/gaucho-icon.svg",
+    icon: "/gaucho-logo-final.png",
+    shortcut: "/gaucho-logo-final.png",
+    apple: "/gaucho-logo-final.png",
   },
 }
 

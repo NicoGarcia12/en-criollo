@@ -129,18 +129,28 @@ export function UnifiedForm({ initialValues }: UnifiedFormProps) {
         body: JSON.stringify(payload),
       })
 
-      const data = await res.json()
-
-      if (!res.ok) {
-        throw new Error(data.error || "Error processing request")
+      let data: unknown
+      try {
+        data = await res.json()
+      } catch {
+        throw new Error(t("common.error.invalidResponse"))
       }
 
-      setResult(data)
+      if (!res.ok) {
+        const apiError =
+          typeof data === "object" && data !== null && "error" in data
+            ? String((data as { error?: string }).error || "")
+            : ""
+
+        throw new Error(apiError || t("common.error.server"))
+      }
+
+      setResult(data as UnifiedOutput)
       // Guardamos todos los campos del formulario para poder restaurarlos desde el historial
       addToHistory({
         mode,
         inputSnippet: text.slice(0, 80),
-        output: data,
+        output: data as UnifiedOutput,
         text,
         sender,
         simplicity: simplicity || undefined,
@@ -152,14 +162,18 @@ export function UnifiedForm({ initialValues }: UnifiedFormProps) {
         priorContext: mode === "reply" && priorContext.trim() ? priorContext.trim() : undefined,
       })
     } catch (err) {
-      const msg = err instanceof Error ? err.message : "Unknown error"
+      const msg = err instanceof Error ? err.message : t("common.error.server")
+      const userMsg = msg.toLowerCase().includes("fetch")
+        ? t("common.error.network")
+        : msg
+
       logEncriolloError({
         mode: (mode as "entender" | "responder") || "entender",
         inputLength: text.length,
-        errorLabel: msg,
+        errorLabel: userMsg,
         locale: "es",
       })
-      setResult({ error: msg } as UnifiedOutput)
+      setResult({ error: userMsg } as UnifiedOutput)
     } finally {
       setLoading(false)
     }
