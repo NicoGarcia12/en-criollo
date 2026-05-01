@@ -1,6 +1,6 @@
 "use client"
 
-import { BrainCircuit } from "lucide-react"
+import Image from "next/image"
 import { EnCriolloApp } from "@/components/encriollo/encriollo-app"
 import { LocaleToggle } from "@/components/encriollo/locale-toggle"
 import { useLocale } from "@/lib/i18n/locale-context"
@@ -13,15 +13,14 @@ export default function HomePage() {
       <header className="border-b border-border/60 bg-background/80 backdrop-blur sticky top-0 z-30">
         <div className="mx-auto max-w-3xl px-4 py-4 flex items-center justify-between gap-2">
           <div className="flex items-center gap-2">
-            <div
-              className="size-10 rounded-lg bg-secondary border-2 flex items-center justify-center"
-              style={{
-                borderColor: "color-mix(in oklch, var(--neon) 40%, var(--border))",
-                boxShadow: "0 0 16px color-mix(in oklch, var(--neon) 25%, transparent)",
-              }}
-            >
-              <BrainCircuit className="size-5" aria-hidden style={{ color: "var(--neon)" }} />
-            </div>
+            <Image
+              src="/logo-d-sombrero.jpg"
+              alt="EnCriollo"
+              width={40}
+              height={40}
+              className="rounded-lg"
+              priority
+            />
             <div className="leading-tight">
               <p className="font-semibold tracking-tight">EnCriollo</p>
               <p className="text-xs text-muted-foreground">{t("app.tagline")}</p>
@@ -47,7 +46,10 @@ export default function HomePage() {
       <footer className="border-t border-border/60">
         <div className="mx-auto max-w-3xl px-4 py-6 text-xs text-muted-foreground flex flex-col sm:flex-row gap-2 sm:items-center sm:justify-between">
           <p>{t("footer.disclaimer")}</p>
-          <p>{t("footer.made")}</p>
+          <p>
+            {t("footer.made").replace("EnCriollo", "")}
+            <span style={{ color: "var(--neon)" }}>EnCriollo</span>
+          </p>
         </div>
       </footer>
     </main>

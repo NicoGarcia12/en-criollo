@@ -4,11 +4,10 @@ export const LOCALES: Locale[] = ["es", "en"]
 
 export const DICT = {
   es: {
-    "app.tagline": "Entendé. Respondé. Sin vueltas.",
+    "app.tagline": "Palabras claras, decisiones mejores.",
     "app.title": "Entendé lo importante.",
     "app.titleAccent": "Respondé mejor.",
-    "app.subtitle":
-      "Pegá un texto difícil y te decimos qué significa y qué hacer. O pegá un mensaje incómodo y te ayudamos a responder sin quedar mal.",
+    "app.subtitle": "Textos difíciles en palabras simples. Respuestas que funcionan.",
     "app.start": "Empezar",
     "app.badge": "Mini herramienta con IA",
     "footer.disclaimer": "EnCriollo no reemplaza asesoramiento legal, médico o financiero.",
@@ -97,11 +96,10 @@ export const DICT = {
     "common.charLimit": "Máximo {n} caracteres",
   },
   en: {
-    "app.tagline": "Understand. Reply. No fluff.",
+    "app.tagline": "Clear words, better decisions.",
     "app.title": "Get what matters.",
     "app.titleAccent": "Reply better.",
-    "app.subtitle":
-      "Paste a tough text and we'll tell you what it means and what to do. Or paste an awkward message and we'll help you reply without burning bridges.",
+    "app.subtitle": "Complex texts made simple. Replies that work.",
     "app.start": "Start",
     "app.badge": "Tiny AI tool",
     "footer.disclaimer": "EnCriollo is not a substitute for legal, medical, or financial advice.",
