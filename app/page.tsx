@@ -14,10 +14,10 @@ export default function HomePage() {
         <div className="mx-auto max-w-3xl px-4 py-4 flex items-center justify-between gap-2">
           <div className="flex items-center gap-2">
             <Image
-              src="/logo-a-gaucho.jpg"
+              src="/logo-gaucho-head.jpg"
               alt="EnCriollo"
-              width={40}
-              height={40}
+              width={56}
+              height={56}
               className="rounded-lg"
               priority
             />
@@ -44,11 +44,12 @@ export default function HomePage() {
       </section>
 
       <footer className="border-t border-border/60">
-        <div className="mx-auto max-w-3xl px-4 py-6 text-xs text-muted-foreground flex flex-col sm:flex-row gap-2 sm:items-center sm:justify-between">
+        <div className="mx-auto max-w-3xl px-4 py-6 text-xs text-muted-foreground flex flex-col sm:flex-row gap-4 sm:items-center sm:justify-between">
           <p>
-            {t("footer.disclaimer").replace("EnCriollo", "")}
             <span style={{ color: "var(--neon)" }}>EnCriollo</span>
-            {t("footer.disclaimer").includes("no reemplaza") ? " " + t("footer.disclaimer").split("no reemplaza")[1] : ""}
+            {t("footer.disclaimer").startsWith("EnCriollo")
+              ? " " + t("footer.disclaimer").slice(10)
+              : " " + t("footer.disclaimer")}
           </p>
           <p>{t("footer.made")}</p>
         </div>
