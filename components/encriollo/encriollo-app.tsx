@@ -35,7 +35,6 @@ export function EnCriolloApp() {
             toma los initialValues nuevos como punto de partida */}
         <UnifiedForm
           key={historyKey}
-          onHistoryChange={() => setHistoryKey((k) => k + 1)}
           initialValues={selectedEntry ?? undefined}
         />
       </div>

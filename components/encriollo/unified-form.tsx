@@ -43,13 +43,12 @@ const TONES = ["formal", "friendly", "firm", "warm", "professional", "cold"] as 
 const FORMATS = ["whatsapp", "email", "sms", "linkedin", "letter"] as const
 
 interface UnifiedFormProps {
-  onHistoryChange?: () => void
   // Valores iniciales para pre-cargar el formulario (p.ej. desde el historial)
   // Partial<HistoryEntry> porque no necesitamos id/timestamp para restaurar
   initialValues?: Partial<HistoryEntry>
 }
 
-export function UnifiedForm({ onHistoryChange, initialValues }: UnifiedFormProps) {
+export function UnifiedForm({ initialValues }: UnifiedFormProps) {
   const { t } = useLocale()
 
   // Estado principal — inicializado con initialValues si se pasan
@@ -152,7 +151,6 @@ export function UnifiedForm({ onHistoryChange, initialValues }: UnifiedFormProps
         signature: mode === "reply" && signature.trim() ? signature.trim() : undefined,
         priorContext: mode === "reply" && priorContext.trim() ? priorContext.trim() : undefined,
       })
-      onHistoryChange?.()
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Unknown error"
       logEncriolloError({
