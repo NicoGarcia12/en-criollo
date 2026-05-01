@@ -32,16 +32,7 @@ export default function HomePage() {
       </header>
 
       <section className="mx-auto max-w-3xl px-4 pt-10 pb-6 text-center">
-        <span
-          className="inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1 rounded-full bg-secondary text-secondary-foreground border border-border"
-        >
-          <span
-            className="size-1.5 rounded-full"
-            style={{ background: "var(--neon)", boxShadow: "0 0 6px var(--neon)" }}
-          />
-          {t("app.badge")}
-        </span>
-        <h1 className="mt-4 text-pretty text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight">
+        <h1 className="text-pretty text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight">
           {t("app.title")} <span style={{ color: "var(--neon)" }}>{t("app.titleAccent")}</span>
         </h1>
         <p className="mt-4 text-balance text-base sm:text-lg text-muted-foreground leading-relaxed max-w-xl mx-auto">
