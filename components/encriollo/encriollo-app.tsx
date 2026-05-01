@@ -1,30 +1,46 @@
 "use client"
 
 import { useState } from "react"
-import { History } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { useLocale } from "@/lib/i18n/locale-context"
 import { UnifiedForm } from "./unified-form"
 import { HistoryPanel } from "./history-panel"
 import { useHistory } from "./history-store"
+import type { HistoryEntry } from "./types"
 
 export function EnCriolloApp() {
-  const { t } = useLocale()
   const { items, remove, clear } = useHistory()
+
+  // historyKey fuerza re-mount de UnifiedForm cuando cambia
+  // Sirve tanto para refrescar el contador del panel como para cargar una entrada seleccionada
   const [historyKey, setHistoryKey] = useState(0)
 
+  // Entrada seleccionada del historial para pre-cargar en el formulario
+  const [selectedEntry, setSelectedEntry] = useState<HistoryEntry | null>(null)
+
+  // Al seleccionar una entrada: guardamos los valores Y forzamos re-mount del formulario
+  function handleSelect(item: HistoryEntry) {
+    setSelectedEntry(item)
+    // Incrementar la key provoca que UnifiedForm se desmonte y remonte,
+    // ejecutando useState con los nuevos initialValues desde cero
+    setHistoryKey((k) => k + 1)
+  }
+
   return (
-    <div className="rounded-xl border-2 border-border bg-card shadow-sm relative" style={{ borderColor: "color-mix(in oklch, var(--neon) 15%, var(--border))" }}>
+    <div
+      className="border-border bg-card relative rounded-xl border-2 shadow-sm"
+      style={{ borderColor: "color-mix(in oklch, var(--neon) 15%, var(--border))" }}
+    >
       <div className="p-4 sm:p-6">
-        <UnifiedForm key={historyKey} onHistoryChange={() => setHistoryKey((k) => k + 1)} />
-      </div>
-      <div className="absolute bottom-4 right-4">
-        <HistoryPanel
-          items={items}
-          onSelect={() => {}}
-          onRemove={remove}
-          onClear={clear}
+        {/* key={historyKey} + initialValues={selectedEntry} hacen la magia:
+            cuando key cambia, React re-monta el componente y useState
+            toma los initialValues nuevos como punto de partida */}
+        <UnifiedForm
+          key={historyKey}
+          onHistoryChange={() => setHistoryKey((k) => k + 1)}
+          initialValues={selectedEntry ?? undefined}
         />
+      </div>
+      <div className="absolute right-4 bottom-4">
+        <HistoryPanel items={items} onSelect={handleSelect} onRemove={remove} onClear={clear} />
       </div>
     </div>
   )

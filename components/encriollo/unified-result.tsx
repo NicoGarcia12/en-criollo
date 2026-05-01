@@ -16,8 +16,8 @@ export function UnifiedResult({ data, mode }: UnifiedResultProps) {
 
   if ("error" in data && data.error) {
     return (
-      <div className="mt-6 p-4 rounded-xl border-2 border-destructive/50 bg-destructive/10">
-        <p className="text-sm text-destructive">{data.error}</p>
+      <div className="border-destructive/50 bg-destructive/10 mt-6 rounded-xl border-2 p-4">
+        <p className="text-destructive text-sm">{data.error}</p>
       </div>
     )
   }
@@ -26,11 +26,11 @@ export function UnifiedResult({ data, mode }: UnifiedResultProps) {
     <div className="mt-6 space-y-4">
       {/* Alerta si hay riesgo */}
       {data.alert && (
-        <div className="p-4 rounded-xl border-2 border-amber-500/50 bg-amber-500/10 flex gap-3">
-          <AlertTriangle className="size-5 text-amber-500 shrink-0 mt-0.5" aria-hidden />
+        <div className="flex gap-3 rounded-xl border-2 border-amber-500/50 bg-amber-500/10 p-4">
+          <AlertTriangle className="mt-0.5 size-5 shrink-0 text-amber-500" aria-hidden />
           <div>
-            <p className="font-semibold text-amber-500 text-sm">{t("result.alert")}</p>
-            <p className="text-sm mt-1">{data.alert}</p>
+            <p className="text-sm font-semibold text-amber-500">{t("result.alert")}</p>
+            <p className="mt-1 text-sm">{data.alert}</p>
           </div>
         </div>
       )}
@@ -51,7 +51,7 @@ export function UnifiedResult({ data, mode }: UnifiedResultProps) {
         <ResultCard icon={<ListChecks className="size-4" />} title={t("result.keypoints")}>
           <ul className="space-y-1.5">
             {data.keyPoints.map((point, i) => (
-              <li key={i} className="text-sm flex gap-2">
+              <li key={i} className="flex gap-2 text-sm">
                 <span className="text-primary font-bold">•</span>
                 <span>{point}</span>
               </li>
@@ -69,8 +69,10 @@ export function UnifiedResult({ data, mode }: UnifiedResultProps) {
         >
           <ul className="space-y-1.5">
             {data.actions.map((action, i) => (
-              <li key={i} className="text-sm flex gap-2">
-                <span className="font-bold" style={{ color: "var(--neon)" }}>{i + 1}.</span>
+              <li key={i} className="flex gap-2 text-sm">
+                <span className="font-bold" style={{ color: "var(--neon)" }}>
+                  {i + 1}.
+                </span>
                 <span>{action}</span>
               </li>
             ))}
@@ -88,7 +90,7 @@ export function UnifiedResult({ data, mode }: UnifiedResultProps) {
         >
           <p className="text-sm leading-relaxed whitespace-pre-wrap">{data.reply}</p>
           {data.replyReason && (
-            <p className="text-xs text-muted-foreground mt-3 pt-3 border-t border-border">
+            <p className="text-muted-foreground border-border mt-3 border-t pt-3 text-xs">
               {data.replyReason}
             </p>
           )}
@@ -101,8 +103,8 @@ export function UnifiedResult({ data, mode }: UnifiedResultProps) {
           <dl className="space-y-2">
             {data.glossary.map((item, i) => (
               <div key={i} className="text-sm">
-                <dt className="font-semibold text-primary inline">{item.term}:</dt>
-                <dd className="inline ml-1">{item.meaning}</dd>
+                <dt className="text-primary inline font-semibold">{item.term}:</dt>
+                <dd className="ml-1 inline">{item.meaning}</dd>
               </div>
             ))}
           </dl>
@@ -144,19 +146,14 @@ function ResultCard({
         : "border-border"
 
   return (
-    <div className={`p-4 rounded-xl border-2 ${borderColor} bg-card`}>
-      <div className="flex items-center justify-between mb-3">
-        <div className="flex items-center gap-2 text-muted-foreground">
+    <div className={`rounded-xl border-2 p-4 ${borderColor} bg-card`}>
+      <div className="mb-3 flex items-center justify-between">
+        <div className="text-muted-foreground flex items-center gap-2">
           {icon}
-          <span className="text-xs font-semibold uppercase tracking-wide">{title}</span>
+          <span className="text-xs font-semibold tracking-wide uppercase">{title}</span>
         </div>
         {copyText && (
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={handleCopy}
-            className="h-7 px-2 text-xs gap-1"
-          >
+          <Button variant="ghost" size="sm" onClick={handleCopy} className="h-7 gap-1 px-2 text-xs">
             {copied ? (
               <>
                 <Check className="size-3" aria-hidden />

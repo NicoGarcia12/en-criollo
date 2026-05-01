@@ -20,6 +20,8 @@ export function LocaleProvider({ children }: { children: React.ReactNode }) {
     try {
       const stored = window.localStorage.getItem(STORAGE_KEY) as Locale | null
       if (stored === "es" || stored === "en") {
+        // Hidratación desde localStorage — setState síncrono intencional para evitar SSR mismatch.
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setLocaleState(stored)
         document.documentElement.lang = stored
         return
@@ -49,7 +51,9 @@ export function LocaleProvider({ children }: { children: React.ReactNode }) {
     [locale],
   )
 
-  return <LocaleContext.Provider value={{ locale, setLocale, t }}>{children}</LocaleContext.Provider>
+  return (
+    <LocaleContext.Provider value={{ locale, setLocale, t }}>{children}</LocaleContext.Provider>
+  )
 }
 
 export function useLocale() {

@@ -10,7 +10,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet"
-import { History, Trash2, BookOpen, MessageSquareReply } from "lucide-react"
+import { History, Trash2, BookOpen, MessageSquareReply, RotateCcw } from "lucide-react"
 import { useLocale } from "@/lib/i18n/locale-context"
 import type { HistoryEntry } from "./types"
 
@@ -21,7 +21,7 @@ type Props = {
   onClear: () => void
 }
 
-export function HistoryPanel({ items, onRemove, onClear }: Props) {
+export function HistoryPanel({ items, onSelect, onRemove, onClear }: Props) {
   const { t, locale } = useLocale()
   const [open, setOpen] = useState(false)
 
@@ -32,14 +32,14 @@ export function HistoryPanel({ items, onRemove, onClear }: Props) {
           <History className="size-3.5" aria-hidden />
           {t("history.title")}
           {items.length > 0 && (
-            <span className="ml-0.5 inline-flex items-center justify-center min-w-[18px] h-4 px-1 rounded-full bg-primary text-primary-foreground text-[10px] font-bold">
+            <span className="bg-primary text-primary-foreground ml-0.5 inline-flex h-4 min-w-[18px] items-center justify-center rounded-full px-1 text-[10px] font-bold">
               {items.length}
             </span>
           )}
         </Button>
       </SheetTrigger>
-      <SheetContent className="w-full sm:max-w-md flex flex-col gap-0 p-0">
-        <SheetHeader className="px-5 py-4 border-b border-border">
+      <SheetContent className="flex w-full flex-col gap-0 p-0 sm:max-w-md">
+        <SheetHeader className="border-border border-b px-5 py-4">
           <SheetTitle className="flex items-center gap-2 text-base">
             <History className="size-4" aria-hidden />
             {t("history.title")}
@@ -49,25 +49,30 @@ export function HistoryPanel({ items, onRemove, onClear }: Props) {
           </SheetDescription>
         </SheetHeader>
 
-        <div className="flex-1 overflow-y-auto p-4 space-y-2">
+        <div className="flex-1 space-y-2 overflow-y-auto p-4">
           {items.length === 0 ? (
-            <div className="text-sm text-muted-foreground text-center py-12 px-4">{t("history.empty")}</div>
+            <div className="text-muted-foreground px-4 py-12 text-center text-sm">
+              {t("history.empty")}
+            </div>
           ) : (
             items.map((item) => (
-              <article
-                key={item.id}
-                className="rounded-lg border border-border bg-card p-3"
-              >
-                <header className="flex items-start justify-between gap-2 mb-2">
+              <article key={item.id} className="border-border bg-card rounded-lg border p-3">
+                <header className="mb-2 flex items-start justify-between gap-2">
                   <div className="flex items-center gap-1.5 text-xs font-semibold">
                     {item.mode === "understand" ? (
                       <BookOpen className="size-3.5" aria-hidden style={{ color: "var(--neon)" }} />
                     ) : (
-                      <MessageSquareReply className="size-3.5" aria-hidden style={{ color: "var(--neon)" }} />
+                      <MessageSquareReply
+                        className="size-3.5"
+                        aria-hidden
+                        style={{ color: "var(--neon)" }}
+                      />
                     )}
-                    <span>{item.mode === "understand" ? t("uf.mode.understand") : t("uf.mode.reply")}</span>
+                    <span>
+                      {item.mode === "understand" ? t("uf.mode.understand") : t("uf.mode.reply")}
+                    </span>
                   </div>
-                  <time className="text-[10px] text-muted-foreground tabular-nums">
+                  <time className="text-muted-foreground text-[10px] tabular-nums">
                     {new Date(item.timestamp).toLocaleString(locale, {
                       day: "2-digit",
                       month: "short",
@@ -76,29 +81,44 @@ export function HistoryPanel({ items, onRemove, onClear }: Props) {
                     })}
                   </time>
                 </header>
-                <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed mb-2">
+                <p className="text-muted-foreground mb-2 line-clamp-2 text-xs leading-relaxed">
                   {item.inputSnippet}…
                 </p>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-6 px-2 text-xs gap-1 text-muted-foreground hover:text-destructive"
-                  onClick={() => onRemove(item.id)}
-                >
-                  <Trash2 className="size-3" aria-hidden />
-                </Button>
+                <footer className="flex items-center gap-1">
+                  {/* Botón restaurar: pre-carga el formulario con los valores de esta entrada */}
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-muted-foreground hover:text-foreground h-6 gap-1 px-2 text-xs"
+                    onClick={() => {
+                      onSelect(item)
+                      setOpen(false) // Cerramos el panel al seleccionar
+                    }}
+                  >
+                    <RotateCcw className="size-3" aria-hidden />
+                    {t("history.restore")}
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-muted-foreground hover:text-destructive h-6 gap-1 px-2 text-xs"
+                    onClick={() => onRemove(item.id)}
+                  >
+                    <Trash2 className="size-3" aria-hidden />
+                  </Button>
+                </footer>
               </article>
             ))
           )}
         </div>
 
         {items.length > 0 && (
-          <div className="border-t border-border p-3">
+          <div className="border-border border-t p-3">
             <Button
               variant="ghost"
               size="sm"
               onClick={onClear}
-              className="w-full text-xs text-muted-foreground hover:text-destructive gap-1.5"
+              className="text-muted-foreground hover:text-destructive w-full gap-1.5 text-xs"
             >
               <Trash2 className="size-3.5" aria-hidden />
               {t("history.clear")}

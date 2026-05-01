@@ -28,10 +28,14 @@ export function CopyButton({ text, label }: { text: string; label?: string }) {
       variant="outline"
       size="sm"
       onClick={handleCopy}
-      className="gap-1.5 h-8 bg-card"
+      className="bg-card h-8 gap-1.5"
       aria-label={finalLabel}
     >
-      {copied ? <Check className="size-3.5" aria-hidden /> : <Copy className="size-3.5" aria-hidden />}
+      {copied ? (
+        <Check className="size-3.5" aria-hidden />
+      ) : (
+        <Copy className="size-3.5" aria-hidden />
+      )}
       {copied ? t("common.copied") : finalLabel}
     </Button>
   )

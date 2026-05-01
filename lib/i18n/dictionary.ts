@@ -87,13 +87,18 @@ export const DICT = {
     copied: "Copiado",
 
     // History
-    "history.title": "Historial",
+    "history.title": "Últimos 5 pedidos",
     "history.empty": "Sin análisis guardados.",
     "history.clear": "Borrar",
+    "history.restore": "Restaurar",
 
     // Common
     "common.chars": "caracteres",
     "common.charLimit": "Máximo {n} caracteres",
+    "common.copy": "Copiar",
+    "common.copied": "Copiado",
+    "common.error.generic": "No se pudo copiar",
+    "locale.label": "Idioma",
   },
   en: {
     "app.tagline": "Clear words, better decisions.",
@@ -179,13 +184,18 @@ export const DICT = {
     copied: "Copied",
 
     // History
-    "history.title": "History",
+    "history.title": "Last 5 requests",
     "history.empty": "No saved analyses.",
     "history.clear": "Clear",
+    "history.restore": "Restore",
 
     // Common
     "common.chars": "characters",
     "common.charLimit": "Max {n} characters",
+    "common.copy": "Copy",
+    "common.copied": "Copied",
+    "common.error.generic": "Could not copy",
+    "locale.label": "Language",
   },
 } as const
 
@@ -194,5 +204,8 @@ export type DictKey = keyof (typeof DICT)["es"]
 export function t(locale: Locale, key: DictKey, vars?: Record<string, string | number>) {
   const raw = DICT[locale][key] ?? DICT.es[key] ?? key
   if (!vars) return raw
-  return Object.entries(vars).reduce((s, [k, v]) => s.replaceAll(`{${k}}`, String(v)), raw as string)
+  return Object.entries(vars).reduce(
+    (s, [k, v]) => s.replaceAll(`{${k}}`, String(v)),
+    raw as string,
+  )
 }

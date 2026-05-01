@@ -14,13 +14,11 @@ import {
 } from "@/components/ui/select"
 import { Loader2, RotateCcw, ChevronDown } from "lucide-react"
 import { useLocale } from "@/lib/i18n/locale-context"
-import { CharCounter } from "./char-counter"
+import { CharCounter, MAX_INPUT_CHARS } from "./char-counter"
 import { UnifiedResult } from "./unified-result"
 import { logEncriolloError } from "./error-logger"
 import { addToHistory } from "./history-store"
-import type { UnifiedOutput } from "./types"
-
-const MAX_INPUT_CHARS = 8000 // limit
+import type { HistoryEntry, UnifiedOutput } from "./types"
 
 // Opciones de remitente (para ambos modos)
 const SENDERS = [
@@ -46,36 +44,57 @@ const FORMATS = ["whatsapp", "email", "sms", "linkedin", "letter"] as const
 
 interface UnifiedFormProps {
   onHistoryChange?: () => void
+  // Valores iniciales para pre-cargar el formulario (p.ej. desde el historial)
+  // Partial<HistoryEntry> porque no necesitamos id/timestamp para restaurar
+  initialValues?: Partial<HistoryEntry>
 }
 
-export function UnifiedForm({ onHistoryChange }: UnifiedFormProps) {
+export function UnifiedForm({ onHistoryChange, initialValues }: UnifiedFormProps) {
   const { t } = useLocale()
 
-  // Estado principal
-  const [text, setText] = useState("")
-  const [mode, setMode] = useState<"understand" | "reply" | "">("")
+  // Estado principal — inicializado con initialValues si se pasan
+  // Esto funciona porque el componente se re-monta (via key) cuando initialValues cambia
+  const [text, setText] = useState(initialValues?.text ?? "")
+  const [mode, setMode] = useState<"understand" | "reply" | "">(
+    (initialValues?.mode as "understand" | "reply" | "") ?? "",
+  )
 
   // Campos compartidos
-  const [sender, setSender] = useState<(typeof SENDERS)[number]>("sender.unknown")
+  const [sender, setSender] = useState<(typeof SENDERS)[number]>(
+    (initialValues?.sender as (typeof SENDERS)[number]) ?? "sender.unknown",
+  )
   const [senderOther, setSenderOther] = useState("")
 
   // Campos modo "entender"
-  const [simplicity, setSimplicity] = useState<(typeof SIMPLICITY)[number] | "">("")
-  const [objective, setObjective] = useState("")
+  const [simplicity, setSimplicity] = useState<(typeof SIMPLICITY)[number] | "">(
+    (initialValues?.simplicity as (typeof SIMPLICITY)[number]) ?? "",
+  )
+  const [objective, setObjective] = useState(initialValues?.objective ?? "")
 
   // Campos modo "responder"
-  const [tone, setTone] = useState<(typeof TONES)[number]>("friendly")
-  const [format, setFormat] = useState<(typeof FORMATS)[number]>("whatsapp")
-  const [goal, setGoal] = useState("")
-  const [signature, setSignature] = useState("")
-  const [showContext, setShowContext] = useState(false)
-  const [priorContext, setPriorContext] = useState("")
+  const [tone, setTone] = useState<(typeof TONES)[number]>(
+    (initialValues?.tone as (typeof TONES)[number]) ?? "friendly",
+  )
+  const [format, setFormat] = useState<(typeof FORMATS)[number]>(
+    (initialValues?.format as (typeof FORMATS)[number]) ?? "whatsapp",
+  )
+  const [goal, setGoal] = useState(initialValues?.goal ?? "")
+  const [signature, setSignature] = useState(initialValues?.signature ?? "")
+  const [showContext, setShowContext] = useState(
+    // Si hay contexto previo guardado, mostrarlo expandido automáticamente
+    Boolean(initialValues?.priorContext),
+  )
+  const [priorContext, setPriorContext] = useState(initialValues?.priorContext ?? "")
 
   // Estado de UI
   const [loading, setLoading] = useState(false)
   const [result, setResult] = useState<UnifiedOutput | null>(null)
 
-  const canSubmit = text.trim().length > 0 && mode !== "" && (mode === "reply" || simplicity !== "") && text.length <= MAX_INPUT_CHARS
+  const canSubmit =
+    text.trim().length > 0 &&
+    mode !== "" &&
+    (mode === "reply" || simplicity !== "") &&
+    text.length <= MAX_INPUT_CHARS
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -118,10 +137,20 @@ export function UnifiedForm({ onHistoryChange }: UnifiedFormProps) {
       }
 
       setResult(data)
+      // Guardamos todos los campos del formulario para poder restaurarlos desde el historial
       addToHistory({
         mode,
         inputSnippet: text.slice(0, 80),
         output: data,
+        text,
+        sender,
+        simplicity: simplicity || undefined,
+        objective: objective.trim() || undefined,
+        tone: mode === "reply" ? tone : undefined,
+        format: mode === "reply" ? format : undefined,
+        goal: mode === "reply" && goal.trim() ? goal.trim() : undefined,
+        signature: mode === "reply" && signature.trim() ? signature.trim() : undefined,
+        priorContext: mode === "reply" && priorContext.trim() ? priorContext.trim() : undefined,
       })
       onHistoryChange?.()
     } catch (err) {
@@ -143,7 +172,7 @@ export function UnifiedForm({ onHistoryChange }: UnifiedFormProps) {
     setMode("")
     setSender("sender.unknown")
     setSenderOther("")
-    setSimplicity("simple")
+    setSimplicity("")
     setObjective("")
     setTone("friendly")
     setFormat("whatsapp")
@@ -169,12 +198,12 @@ export function UnifiedForm({ onHistoryChange }: UnifiedFormProps) {
             value={text}
             onChange={(e) => setText(e.target.value)}
             placeholder={t("uf.text.placeholder")}
-            className="min-h-[140px] bg-input border-border resize-y"
+            className="bg-input border-border min-h-[140px] resize-y"
             disabled={loading}
             aria-describedby="char-counter"
           />
-          <div className="flex items-center justify-between text-xs text-muted-foreground">
-            <CharCounter current={text.length} max={MAX_INPUT_CHARS} />
+          <div className="text-muted-foreground flex items-center justify-between text-xs">
+            <CharCounter id="char-counter" value={text} />
             <span>{t("uf.text.hint")}</span>
           </div>
         </div>
@@ -201,7 +230,7 @@ export function UnifiedForm({ onHistoryChange }: UnifiedFormProps) {
 
         {/* Campos condicionales según modo */}
         {mode && (
-          <div className="space-y-4 pt-2 border-t border-border">
+          <div className="border-border space-y-4 border-t pt-2">
             {/* Remitente - compartido */}
             <div className="space-y-2">
               <Label htmlFor="sender" className="text-sm font-medium">
@@ -262,7 +291,8 @@ export function UnifiedForm({ onHistoryChange }: UnifiedFormProps) {
 
                 <div className="space-y-2">
                   <Label htmlFor="objective" className="text-sm font-medium">
-                    {t("uf.objective.label")} <span className="text-muted-foreground text-xs">({t("optional")})</span>
+                    {t("uf.objective.label")}{" "}
+                    <span className="text-muted-foreground text-xs">({t("optional")})</span>
                   </Label>
                   <Input
                     id="objective"
@@ -328,7 +358,8 @@ export function UnifiedForm({ onHistoryChange }: UnifiedFormProps) {
 
                 <div className="space-y-2">
                   <Label htmlFor="goal" className="text-sm font-medium">
-                    {t("uf.goal.label")} <span className="text-muted-foreground text-xs">({t("optional")})</span>
+                    {t("uf.goal.label")}{" "}
+                    <span className="text-muted-foreground text-xs">({t("optional")})</span>
                   </Label>
                   <Input
                     id="goal"
@@ -343,7 +374,8 @@ export function UnifiedForm({ onHistoryChange }: UnifiedFormProps) {
 
                 <div className="space-y-2">
                   <Label htmlFor="signature" className="text-sm font-medium">
-                    {t("uf.signature.label")} <span className="text-muted-foreground text-xs">({t("optional")})</span>
+                    {t("uf.signature.label")}{" "}
+                    <span className="text-muted-foreground text-xs">({t("optional")})</span>
                   </Label>
                   <Input
                     id="signature"
@@ -361,9 +393,11 @@ export function UnifiedForm({ onHistoryChange }: UnifiedFormProps) {
                   <button
                     type="button"
                     onClick={() => setShowContext(!showContext)}
-                    className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors"
+                    className="text-muted-foreground hover:text-foreground flex items-center gap-1 text-sm transition-colors"
                   >
-                    <ChevronDown className={`size-4 transition-transform ${showContext ? "rotate-180" : ""}`} />
+                    <ChevronDown
+                      className={`size-4 transition-transform ${showContext ? "rotate-180" : ""}`}
+                    />
                     {t("uf.context.toggle")}
                   </button>
                   {showContext && (
@@ -371,7 +405,7 @@ export function UnifiedForm({ onHistoryChange }: UnifiedFormProps) {
                       value={priorContext}
                       onChange={(e) => setPriorContext(e.target.value)}
                       placeholder={t("uf.context.placeholder")}
-                      className="min-h-[80px] bg-input border-border"
+                      className="bg-input border-border min-h-[80px]"
                       disabled={loading}
                       maxLength={500}
                     />
@@ -394,7 +428,7 @@ export function UnifiedForm({ onHistoryChange }: UnifiedFormProps) {
         >
           {loading ? (
             <>
-              <Loader2 className="size-4 animate-spin mr-2" aria-hidden />
+              <Loader2 className="mr-2 size-4 animate-spin" aria-hidden />
               {t("uf.submit.loading")}
             </>
           ) : (
@@ -407,7 +441,7 @@ export function UnifiedForm({ onHistoryChange }: UnifiedFormProps) {
             variant="ghost"
             size="sm"
             onClick={handleClear}
-            className="gap-1.5 text-muted-foreground"
+            className="text-muted-foreground gap-1.5"
           >
             <RotateCcw className="size-3.5" aria-hidden />
             {t("uf.clear")}

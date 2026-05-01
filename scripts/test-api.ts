@@ -2,13 +2,16 @@
 // Ejecutar con: npx tsx scripts/test-api.ts
 
 async function testEncriolloAPI() {
-  const baseUrl = process.env.VERCEL_URL 
-    ? `https://${process.env.VERCEL_URL}` 
+  const _baseUrl = process.env.VERCEL_URL
+    ? `https://${process.env.VERCEL_URL}`
     : "http://localhost:3000"
 
   console.log("[v0] Testing EnCriollo API...")
   console.log("[v0] OPENAI_API_KEY exists:", !!process.env.OPENAI_API_KEY)
-  console.log("[v0] OPENAI_API_KEY first 10 chars:", process.env.OPENAI_API_KEY?.slice(0, 10) || "N/A")
+  console.log(
+    "[v0] OPENAI_API_KEY first 10 chars:",
+    process.env.OPENAI_API_KEY?.slice(0, 10) || "N/A",
+  )
 
   // Test simple con modo "entender"
   const testPayload = {
@@ -16,7 +19,7 @@ async function testEncriolloAPI() {
     text: "Hola, necesito que me confirmes la cita de mañana a las 3pm.",
     senderType: "general",
     outputLanguage: "es",
-    userGoal: ""
+    userGoal: "",
   }
 
   try {
@@ -37,19 +40,19 @@ async function testEncriolloAPI() {
 
     const testSchema = z.object({
       summary: z.string(),
-      tone: z.string()
+      tone: z.string(),
     })
 
     const result = await generateText({
       model,
       system: "Eres un asistente que analiza mensajes.",
-      prompt: "Analiza este mensaje: 'Hola, necesito que me confirmes la cita de mañana a las 3pm.' Responde con un resumen corto y el tono detectado.",
+      prompt:
+        "Analiza este mensaje: 'Hola, necesito que me confirmes la cita de mañana a las 3pm.' Responde con un resumen corto y el tono detectado.",
       output: Output.object({ schema: testSchema }),
     })
 
     console.log("[v0] SUCCESS! Response:", JSON.stringify(result.output, null, 2))
     return true
-
   } catch (error) {
     console.error("[v0] ERROR:", error)
     if (error instanceof Error) {
