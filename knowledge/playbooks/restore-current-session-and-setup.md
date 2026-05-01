@@ -165,3 +165,17 @@ Y para validar estado:
 ```bash
 pnpm lint && pnpm typecheck
 ```
+
+---
+
+## Nota operativa de esta sesión (2026-05-01)
+
+- En esta oportunidad se **pusheó directo sin correr quality gate previo** (format/lint/typecheck/tests) por decisión explícita del usuario.
+- El quality gate queda pendiente para ejecución manual posterior.
+
+---
+
+## Nota de esta sesión (2026-05-01)
+
+- En este cierre se hizo **push directo** por decisión del usuario.
+- El **quality gate (format/lint/typecheck/tests)** quedó pendiente para ejecución manual posterior por el usuario.
