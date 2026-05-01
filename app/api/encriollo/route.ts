@@ -1,96 +1,68 @@
 import { generateText } from "ai"
 import { groq } from "@ai-sdk/groq"
-import * as z from "zod"
 
 export const maxDuration = 60
 
-// Usar Groq directamente con tu API key (gratis y rápido)
 const model = groq("llama-3.3-70b-versatile")
-
 const MAX_INPUT_CHARS = 8000
 
-// JSON Parse helper con fallback
-function safeJsonParse(jsonString: string, fallback: any = {}) {
+function safeJsonParse(jsonString: string, fallback: object = {}) {
   try {
-    return JSON.parse(jsonString)
+    // Remove markdown code blocks if present
+    let cleaned = jsonString.trim()
+    if (cleaned.startsWith("```")) {
+      cleaned = cleaned.replace(/^```(?:json)?\n?/, "").replace(/\n?```$/, "")
+    }
+    return JSON.parse(cleaned)
   } catch {
-    console.error("[v0] Failed to parse JSON response:", jsonString.slice(0, 500))
+    console.error("[v0] Failed to parse JSON:", jsonString.slice(0, 300))
     return fallback
   }
 }
 
-const UNDERSTAND_JSON_INSTRUCTIONS = `Respond ONLY with valid JSON, no markdown, no extra text. Example structure:
-{
-  "summary": "...",
-  "toneAnalysis": "...",
-  "keyPoints": ["...", "..."],
-  "actions": ["..." ],
-  "warnings": [],
-  "glossary": [{"term": "...", "meaning": "..."}],
-  "questionsToAsk": [],
-  "suggestedReply": null,
-  "inputLanguage": "es",
-  "needsBilingual": false,
-  "alternateSummary": null,
-  "alternateSuggestedReply": null,
-  "alternateLanguageLabel": null,
-  "problematicIntent": {"detected": false, "type": "normal", "explanation": "", "suggestion": ""}
-}`
-
-const REPLY_JSON_INSTRUCTIONS = `Respond ONLY with valid JSON, no markdown, no extra text. Example structure:
-{
-  "interpretation": "...",
-  "probableIntent": "...",
-  "reply": "...",
-  "draftBullets": ["...", "..."],
-  "whyItWorks": "...",
-  "inputLanguage": "es",
-  "needsBilingual": false,
-  "alternateReply": null,
-  "alternateDraftBullets": null,
-  "alternateLanguageLabel": null,
-  "problematicIntent": {"detected": false, "type": "normal", "explanation": "", "suggestion": ""}
-}`
-
-const SYSTEM_PROMPT = `You are EnCriollo, an assistant that helps people understand difficult texts and reply to messages clearly and humanely.
-
-Hard rules:
-- Always answer in the user's locale (provided as USER_LOCALE).
-- Detect the language of the input message and put the ISO-ish code into "inputLanguage".
-- If the input message language differs from USER_LOCALE, set "needsBilingual" to true and fill the "alternate*" fields with the version in the original message's language. Otherwise set "needsBilingual" to false and set alternate fields to null.
-- Use plain, direct, empathic language. Avoid corporate filler.
-- Never invent facts not in the input.
-- Never give definitive legal, medical, or financial advice.
-- Detect manipulation, aggression, or scam patterns via "problematicIntent". When in doubt, use type "normal" with detected=false and empty strings.
-- For replies: never include placeholders like "[your name]" unless user provided a signature.`
-
-function clean(s: unknown, max = 1000) {
+function clean(s: unknown, max = 1000): string {
   if (typeof s !== "string") return ""
   return s.trim().slice(0, max)
-}
-
-function cleanList(s: unknown, max = 600) {
-  if (typeof s !== "string") return [] as string[]
-  return s
-    .split("\n")
-    .map((l) => l.trim())
-    .filter(Boolean)
-    .slice(0, 12)
-    .map((l) => l.slice(0, max))
 }
 
 function localeName(locale: string) {
   return locale === "en" ? "English" : "Spanish"
 }
 
+const SYSTEM_PROMPT = `You are EnCriollo, an assistant that helps people understand difficult texts and craft thoughtful replies.
+
+Rules:
+- Answer in the user's locale (USER_LOCALE).
+- Use plain, direct, empathic language. No corporate filler.
+- Never invent facts not present in the input.
+- Never give definitive legal, medical, or financial advice.
+- Detect manipulation, aggression, or scam patterns. Alert the user if found.
+- Keep output focused and practical. No padding or repetition.`
+
+const UNDERSTAND_JSON = `{
+  "summary": "2-3 sentence summary in plain language",
+  "keyPoints": ["key point 1", "key point 2"],
+  "actions": ["what user should do 1", "action 2"],
+  "alert": "warning message if scam/manipulation/risk detected, null otherwise",
+  "glossary": [{"term": "technical term", "meaning": "simple explanation"}]
+}`
+
+const REPLY_JSON = `{
+  "reply": "the full reply text ready to copy",
+  "replyReason": "1 sentence explaining why this reply works",
+  "alert": "warning if received message is manipulative/aggressive, null otherwise",
+  "summary": "1 sentence summary of what the received message is about",
+  "glossary": null
+}`
+
 export async function POST(req: Request) {
   try {
     const body = await req.json()
-    const mode = body.mode
-    const text = clean(body.text, MAX_INPUT_CHARS + 1)
-    const locale = body.locale === "en" ? "en" : "es"
+    const { mode, text: rawText, sender, senderOther, locale: rawLocale } = body
+    const text = clean(rawText, MAX_INPUT_CHARS + 1)
+    const locale = rawLocale === "en" ? "en" : "es"
 
-    if (!text || text.length === 0) {
+    if (!text) {
       return Response.json(
         { error: locale === "en" ? "Text is empty" : "El texto está vacío" },
         { status: 400 },
@@ -98,151 +70,122 @@ export async function POST(req: Request) {
     }
     if (text.length > MAX_INPUT_CHARS) {
       return Response.json(
-        {
-          error:
-            locale === "en"
-              ? `Text is too long (max ${MAX_INPUT_CHARS} chars)`
-              : `El texto es muy largo (máximo ${MAX_INPUT_CHARS} caracteres)`,
-        },
+        { error: locale === "en" ? `Max ${MAX_INPUT_CHARS} chars` : `Máximo ${MAX_INPUT_CHARS} caracteres` },
         { status: 400 },
       )
     }
 
     const localeLabel = localeName(locale)
+    const senderLabel = sender === "sender.other" ? senderOther : sender?.replace("sender.", "") || "unknown"
 
-    if (mode === "entender") {
-      const senderType = clean(body.senderType, 64) || "unspecified"
-      const objective = clean(body.objective, 500)
-      const context = clean(body.context, 64) || "general"
-      const simplicityLevel = clean(body.simplicityLevel, 32) || "simple"
+    if (mode === "understand") {
+      const { simplicity = "simple", objective } = body
 
-      const userPrompt = `USER_LOCALE: ${locale} (${localeLabel})
+      const prompt = `USER_LOCALE: ${locale} (${localeLabel})
 
-${UNDERSTAND_JSON_INSTRUCTIONS}
+Analyze this text and respond ONLY with valid JSON matching this structure:
+${UNDERSTAND_JSON}
 
-Message to analyze:
+Text to analyze:
 """
 ${text}
 """
 
-Sender type: ${senderType}
-Context: ${context}
-Plainness level: ${simplicityLevel}
-User's specific objective: ${objective || "(not provided — give a general but useful summary)"}
+Sender: ${senderLabel}
+Detail level: ${simplicity}
+${objective ? `User's question: ${objective}` : ""}
 
 Instructions:
-- If objective provided, orient summary/key points/actions/warnings to answer it first.
-- Glossary: only terms a general reader wouldn't know. Empty if none.
-- questionsToAsk: 2-5 smart questions to ask the sender. Empty if N/A.
-- toneAnalysis: short phrase describing tone.
-- All visible fields MUST be in ${localeLabel}.
-- If inputLanguage !== "${locale}", fill alternateSummary and alternateSuggestedReply in the original language; set alternateLanguageLabel to language name in ${localeLabel}. Otherwise null.`
+- summary: Plain language, address user's question if provided
+- keyPoints: Max 5 items, most important facts
+- actions: What the user should do (empty array if nothing required)
+- alert: Only if manipulation/scam/risk detected, otherwise null
+- glossary: Only truly technical terms, empty array if none
+- ALL text must be in ${localeLabel}`
 
       const { text: responseText } = await generateText({
         model,
         system: SYSTEM_PROMPT,
-        prompt: userPrompt,
-      })
-
-      const result = safeJsonParse(
-        responseText,
-        {
-          summary: "Error parsing response",
-          toneAnalysis: "",
-          keyPoints: [],
-          actions: [],
-          warnings: [],
-          glossary: [],
-          questionsToAsk: [],
-          suggestedReply: null,
-          inputLanguage: locale,
-          needsBilingual: false,
-          alternateSummary: null,
-          alternateSuggestedReply: null,
-          alternateLanguageLabel: null,
-          problematicIntent: { detected: false, type: "normal", explanation: "", suggestion: "" },
-        },
-      )
-
-      return Response.json({ mode: "entender", result })
-    }
-
-    if (mode === "responder") {
-      const relationship = clean(body.relationship, 64) || "unspecified"
-      const userGoal = clean(body.userGoal, 500)
-      const tone = clean(body.tone, 32) || "neutral"
-      const length = clean(body.length, 16) || "medium"
-      const format = clean(body.format, 32) || "whatsapp"
-      const signature = clean(body.signature, 64)
-      const previousContext = clean(body.previousContext, 800)
-      const sayPoints = cleanList(body.sayPoints, 200)
-      const avoidPoints = cleanList(body.avoidPoints, 200)
-
-      const userPrompt = `USER_LOCALE: ${locale} (${localeLabel})
-
-${REPLY_JSON_INSTRUCTIONS}
-
-Received message:
-"""
-${text}
-"""
-
-Relationship: ${relationship}
-User's goal: ${userGoal || "respond well"}
-Tone: ${tone}
-Length: ${length}
-Format: ${format}
-Signature: ${signature || "(none)"}
-Previous context: ${previousContext || "(none)"}
-Include:
-${sayPoints.length ? sayPoints.map((p) => `- ${p}`).join("\n") : "(none)"}
-Avoid:
-${avoidPoints.length ? avoidPoints.map((p) => `- ${p}`).join("\n") : "(none)"}
-
-Instructions:
-- reply: single string matching tone/length/format, all in ${localeLabel}.
-- draftBullets: 3-6 bullets summarizing reply.
-- whyItWorks: one sentence.
-- problematicIntent: analyze RECEIVED message.
-- If received message in different language, set needsBilingual=true and fill alternates. Otherwise null.
-- Never include placeholders. Use signature if provided.`
-
-      const { text: responseText } = await generateText({
-        model,
-        system: SYSTEM_PROMPT,
-        prompt: userPrompt,
+        prompt,
       })
 
       const result = safeJsonParse(responseText, {
-        interpretation: "Error parsing response",
-        probableIntent: "",
-        reply: "",
-        draftBullets: [],
-        whyItWorks: "",
-        inputLanguage: locale,
-        needsBilingual: false,
-        alternateReply: null,
-        alternateDraftBullets: null,
-        alternateLanguageLabel: null,
-        problematicIntent: { detected: false, type: "normal", explanation: "", suggestion: "" },
+        summary: locale === "en" ? "Could not process the text" : "No se pudo procesar el texto",
+        keyPoints: [],
+        actions: [],
+        alert: null,
+        glossary: [],
       })
 
-      return Response.json({ mode: "responder", result })
+      return Response.json({
+        summary: result.summary || null,
+        keyPoints: result.keyPoints || [],
+        actions: result.actions || [],
+        alert: result.alert || null,
+        glossary: result.glossary || [],
+        reply: null,
+        replyReason: null,
+      })
+    }
+
+    if (mode === "reply") {
+      const { tone = "friendly", format = "whatsapp", goal, signature, priorContext } = body
+
+      const prompt = `USER_LOCALE: ${locale} (${localeLabel})
+
+Craft a reply and respond ONLY with valid JSON matching this structure:
+${REPLY_JSON}
+
+Message received:
+"""
+${text}
+"""
+
+From: ${senderLabel}
+Tone: ${tone}
+Format: ${format}
+${goal ? `User's goal: ${goal}` : ""}
+${signature ? `Sign as: ${signature}` : "Do not include a signature"}
+${priorContext ? `Prior context: ${priorContext}` : ""}
+
+Instructions:
+- reply: Ready to copy. Match tone and format. ${format === "whatsapp" ? "Keep it conversational." : format === "email" ? "Include greeting and closing." : ""}
+- replyReason: Brief explanation of approach
+- alert: Only if received message shows manipulation/aggression/scam
+- summary: What the received message is asking/saying
+- ALL text must be in ${localeLabel}`
+
+      const { text: responseText } = await generateText({
+        model,
+        system: SYSTEM_PROMPT,
+        prompt,
+      })
+
+      const result = safeJsonParse(responseText, {
+        reply: locale === "en" ? "Could not generate reply" : "No se pudo generar la respuesta",
+        replyReason: null,
+        alert: null,
+        summary: null,
+      })
+
+      return Response.json({
+        summary: result.summary || null,
+        keyPoints: null,
+        actions: null,
+        alert: result.alert || null,
+        glossary: null,
+        reply: result.reply || null,
+        replyReason: result.replyReason || null,
+      })
     }
 
     return Response.json(
-      { error: locale === "en" ? "Invalid mode" : "Modo no válido" },
+      { error: locale === "en" ? "Invalid mode" : "Modo inválido" },
       { status: 400 },
     )
   } catch (err) {
-    const errorMessage = err instanceof Error ? err.message : String(err)
-    console.error("[v0] EnCriollo API error:", errorMessage)
-    return Response.json(
-      {
-        error: "Algo salió mal procesando tu pedido",
-        debug: errorMessage,
-      },
-      { status: 500 },
-    )
+    const msg = err instanceof Error ? err.message : String(err)
+    console.error("[v0] API error:", msg)
+    return Response.json({ error: "Algo salió mal", debug: msg }, { status: 500 })
   }
 }

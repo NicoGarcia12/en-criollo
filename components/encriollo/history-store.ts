@@ -1,12 +1,12 @@
 "use client"
 
 import { useCallback, useEffect, useState } from "react"
-import type { HistoryItem } from "./types"
+import type { HistoryEntry, UnifiedOutput } from "./types"
 
-const STORAGE_KEY = "encriollo:history"
+const STORAGE_KEY = "encriollo:history:v2"
 const MAX_ITEMS = 5
 
-function readStorage(): HistoryItem[] {
+function readStorage(): HistoryEntry[] {
   if (typeof window === "undefined") return []
   try {
     const raw = window.localStorage.getItem(STORAGE_KEY)
@@ -19,7 +19,7 @@ function readStorage(): HistoryItem[] {
   }
 }
 
-function writeStorage(items: HistoryItem[]) {
+function writeStorage(items: HistoryEntry[]) {
   if (typeof window === "undefined") return
   try {
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(items.slice(0, MAX_ITEMS)))
@@ -28,24 +28,41 @@ function writeStorage(items: HistoryItem[]) {
   }
 }
 
+// Function to add to history from outside hook context
+export function addToHistory(entry: { mode: string; inputSnippet: string; output: UnifiedOutput }) {
+  if (typeof window === "undefined") return
+  const current = readStorage()
+  const newEntry: HistoryEntry = {
+    id: crypto.randomUUID(),
+    mode: entry.mode,
+    inputSnippet: entry.inputSnippet,
+    output: entry.output,
+    timestamp: Date.now(),
+  }
+  const next = [newEntry, ...current].slice(0, MAX_ITEMS)
+  writeStorage(next)
+  // Trigger storage event for other tabs
+  window.dispatchEvent(new StorageEvent("storage", { key: STORAGE_KEY }))
+}
+
 export function useHistory() {
-  const [items, setItems] = useState<HistoryItem[]>([])
+  const [items, setItems] = useState<HistoryEntry[]>([])
 
   useEffect(() => {
     setItems(readStorage())
     const onStorage = (e: StorageEvent) => {
-      if (e.key === STORAGE_KEY) setItems(readStorage())
+      if (e.key === STORAGE_KEY || e.key === null) setItems(readStorage())
     }
     window.addEventListener("storage", onStorage)
     return () => window.removeEventListener("storage", onStorage)
   }, [])
 
-  const add = useCallback((item: Omit<HistoryItem, "id" | "createdAt"> & { id?: string }) => {
-    const fullItem = {
+  const add = useCallback((item: Omit<HistoryEntry, "id" | "timestamp">) => {
+    const fullItem: HistoryEntry = {
       ...item,
-      id: item.id ?? crypto.randomUUID(),
-      createdAt: Date.now(),
-    } as HistoryItem
+      id: crypto.randomUUID(),
+      timestamp: Date.now(),
+    }
     setItems((prev) => {
       const next = [fullItem, ...prev].slice(0, MAX_ITEMS)
       writeStorage(next)

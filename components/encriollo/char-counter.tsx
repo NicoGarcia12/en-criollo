@@ -4,9 +4,9 @@ import { useLocale } from "@/lib/i18n/locale-context"
 
 export const MAX_INPUT_CHARS = 8000
 
-export function CharCounter({ value, hint }: { value: string; hint?: string }) {
+export function CharCounter({ value = "", hint }: { value?: string; hint?: string }) {
   const { t, locale } = useLocale()
-  const len = value.length
+  const len = (value || "").length
   const over = len > MAX_INPUT_CHARS
   const near = !over && len > MAX_INPUT_CHARS * 0.85
 
