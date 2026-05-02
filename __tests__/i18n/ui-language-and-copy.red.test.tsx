@@ -55,10 +55,10 @@ describe("RED - UI en español y propuesta de valor", () => {
     render(<HomePage />)
 
     const footer = screen.getByRole("contentinfo")
-    const brandText = footer.querySelector("p:last-child") as HTMLElement | null
+    const brandText = footer.querySelector("p:first-child span") as HTMLElement | null
 
     expect(brandText).not.toBeNull()
-    expect(brandText).toHaveStyle({ color: "var(--neon)" })
+    expect(brandText?.getAttribute("style") ?? "").toContain("var(--neon)")
   })
 
   it("footer: debería incluir autoría profesional de Nicolás García para Zero to Agent", () => {

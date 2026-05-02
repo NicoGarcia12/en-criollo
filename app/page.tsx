@@ -48,8 +48,7 @@ export default function HomePage() {
               Aplicamos el color neón SOLO al texto de marca del lado izquierdo,
               manteniendo el resto del disclaimer y el bloque derecho intactos.
             */}
-            <span style={{ color: "var(--neon)" }}>En Criollo</span>
-            {" "}
+            <span style={{ color: "var(--neon)" }}>En Criollo</span>{" "}
             {t("footer.disclaimer").replace(/^EnCriollo\s*/i, "")}
           </p>
           <p className="sm:ml-auto sm:text-right">{t("footer.made")}</p>

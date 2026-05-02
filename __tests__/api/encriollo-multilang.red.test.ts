@@ -13,10 +13,11 @@ const mockedGenerateText = jest.mocked(generateText)
 
 describe("RED - API multilenguaje según idioma del input", () => {
   beforeEach(() => {
-    ;(globalThis as { Response?: { json: (body: unknown, init?: { status?: number }) => unknown } }).Response =
-      {
-        json: (body: unknown, init?: { status?: number }) => ({ body, status: init?.status ?? 200 }),
-      }
+    ;(
+      globalThis as { Response?: { json: (body: unknown, init?: { status?: number }) => unknown } }
+    ).Response = {
+      json: (body: unknown, init?: { status?: number }) => ({ body, status: init?.status ?? 200 }),
+    }
 
     mockedGenerateText.mockReset()
     mockedGenerateText.mockResolvedValue({

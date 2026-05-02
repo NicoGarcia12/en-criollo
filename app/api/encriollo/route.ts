@@ -32,9 +32,10 @@ function localeName(locale: string) {
 function isLikelySpanish(text: string): boolean {
   const normalized = text.toLowerCase()
   const strongMarks = /[áéíóúñ¿¡]/.test(normalized)
-  const commonWords = /\b(hola|gracias|por|para|que|con|sin|mensaje|responder|reunión|hoy|mañana|usted|vos|che)\b/.test(
-    normalized,
-  )
+  const commonWords =
+    /\b(hola|gracias|por|para|que|con|sin|mensaje|responder|reunión|hoy|mañana|usted|vos|che)\b/.test(
+      normalized,
+    )
 
   return strongMarks || commonWords
 }

@@ -24,7 +24,6 @@ export function LocaleProvider({ children }: { children: React.ReactNode }) {
       if (stored) {
         window.localStorage.setItem(STORAGE_KEY, "es")
       }
-      setLocaleState("es")
       document.documentElement.lang = "es"
     } catch {
       // ignore
