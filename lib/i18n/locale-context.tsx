@@ -18,19 +18,14 @@ export function LocaleProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     try {
-      const stored = window.localStorage.getItem(STORAGE_KEY) as Locale | null
-      if (stored === "es" || stored === "en") {
-        // Hidratación desde localStorage — setState síncrono intencional para evitar SSR mismatch.
-        // eslint-disable-next-line react-hooks/set-state-in-effect
-        setLocaleState(stored)
-        document.documentElement.lang = stored
-        return
+      // Modo UI solo español: mantenemos lang fijo en "es".
+      // Conservamos localStorage por compatibilidad hacia atrás con usuarios previos.
+      const stored = window.localStorage.getItem(STORAGE_KEY)
+      if (stored) {
+        window.localStorage.setItem(STORAGE_KEY, "es")
       }
-      // First visit: detect from navigator
-      const nav = (navigator.language || "es").toLowerCase()
-      const detected: Locale = nav.startsWith("en") ? "en" : "es"
-      setLocaleState(detected)
-      document.documentElement.lang = detected
+      setLocaleState("es")
+      document.documentElement.lang = "es"
     } catch {
       // ignore
     }

@@ -1,17 +1,18 @@
-export type Locale = "es" | "en"
+export type Locale = "es"
 
-export const LOCALES: Locale[] = ["es", "en"]
+export const LOCALES: Locale[] = ["es"]
 
 export const DICT = {
   es: {
     "app.tagline": "Palabras claras, decisiones mejores.",
     "app.title": "Entendé lo importante.",
     "app.titleAccent": "Respondé mejor.",
-    "app.subtitle": "Textos difíciles en palabras simples. Respuestas que funcionan.",
+    "app.subtitle":
+      "Recibís un mensaje, lo entendés de verdad y respondés mejor: dos funcionalidades diferenciadas que trabajan juntas para mejorar tu comunicación.",
     "app.start": "Empezar",
     "app.badge": "Mini herramienta con IA",
     "footer.disclaimer": "EnCriollo no reemplaza asesoramiento legal, médico o financiero.",
-    "footer.made": "Hecho con cariño y un poco de IA.",
+    "footer.made": "Hecho por Nicolás García · Referencia conceptual: Zero to Agent.",
 
     // Unified form
     "uf.text.label": "Tu texto",
@@ -102,106 +103,6 @@ export const DICT = {
     "common.error.server": "Algo salió mal al procesar tu pedido.",
     "common.error.invalidResponse": "La respuesta del servidor llegó en un formato inválido.",
     "locale.label": "Idioma",
-  },
-  en: {
-    "app.tagline": "Clear words, better decisions.",
-    "app.title": "Get what matters.",
-    "app.titleAccent": "Reply better.",
-    "app.subtitle": "Complex texts made simple. Replies that work.",
-    "app.start": "Start",
-    "app.badge": "Tiny AI tool",
-    "footer.disclaimer": "EnCriollo is not a substitute for legal, medical, or financial advice.",
-    "footer.made": "Made with care and a bit of AI.",
-
-    // Unified form
-    "uf.text.label": "Your text",
-    "uf.text.placeholder": "Paste the text you received…",
-    "uf.text.hint": "More complete = better results.",
-    "uf.mode.label": "What do you want to do?",
-    "uf.mode.placeholder": "Choose an option",
-    "uf.mode.understand": "Understand it",
-    "uf.mode.reply": "Reply to it",
-    "uf.sender.label": "Who is it from?",
-    "uf.sender.other.placeholder": "Specify who (e.g. neighbor, landlord…)",
-    "uf.simplicity.label": "Detail level",
-    "uf.objective.label": "Your question",
-    "uf.objective.placeholder": "What do you specifically want to know?",
-    "uf.tone.label": "Tone",
-    "uf.format.label": "Format",
-    "uf.goal.label": "What do you want to achieve?",
-    "uf.goal.placeholder": "E.g. get more time, say no politely…",
-    "uf.signature.label": "Your name",
-    "uf.signature.placeholder": "To sign off the reply",
-    "uf.context.toggle": "Add prior context",
-    "uf.context.placeholder": "What happened before this message?",
-    "uf.submit.understand": "Explain it to me",
-    "uf.submit.reply": "Help me reply",
-    "uf.submit.loading": "Thinking…",
-    "uf.clear": "Clear",
-    optional: "optional",
-
-    // Sender options
-    "sender.unknown": "Not sure / general",
-    "sender.bank": "Bank / financial",
-    "sender.lawyer": "Lawyer / legal",
-    "sender.hr": "HR / employer",
-    "sender.gov": "Government / taxes",
-    "sender.platform": "Platform / app",
-    "sender.medical": "Doctor / clinic",
-    "sender.work": "Work",
-    "sender.client": "Client",
-    "sender.boss": "Boss",
-    "sender.family": "Family",
-    "sender.partner": "Partner",
-    "sender.friend": "Friend",
-    "sender.other": "Other",
-
-    // Simplicity
-    "simplicity.simple": "Simple and direct",
-    "simplicity.detailed": "Detailed",
-    "simplicity.very_detailed": "Very detailed",
-
-    // Tone
-    "tone.formal": "Formal",
-    "tone.friendly": "Friendly",
-    "tone.firm": "Firm",
-    "tone.warm": "Warm",
-    "tone.professional": "Professional",
-    "tone.cold": "Cold / distant",
-
-    // Format
-    "format.whatsapp": "WhatsApp",
-    "format.email": "Email",
-    "format.sms": "SMS / short text",
-    "format.linkedin": "LinkedIn",
-    "format.letter": "Formal letter",
-
-    // Results
-    "result.summary": "Summary",
-    "result.keypoints": "Key points",
-    "result.actions": "What to do",
-    "result.reply": "Your reply",
-    "result.glossary": "Glossary",
-    "result.alert": "Alert",
-    copy: "Copy",
-    copied: "Copied",
-
-    // History
-    "history.title": "Last 5 requests",
-    "history.empty": "No saved analyses.",
-    "history.clear": "Clear",
-    "history.restore": "Restore",
-
-    // Common
-    "common.chars": "characters",
-    "common.charLimit": "Max {n} characters",
-    "common.copy": "Copy",
-    "common.copied": "Copied",
-    "common.error.generic": "Could not copy",
-    "common.error.network": "We couldn't connect. Check your connection and try again.",
-    "common.error.server": "Something went wrong while processing your request.",
-    "common.error.invalidResponse": "The server response came in an invalid format.",
-    "locale.label": "Language",
   },
 } as const
 

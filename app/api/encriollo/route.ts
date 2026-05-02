@@ -29,6 +29,16 @@ function localeName(locale: string) {
   return locale === "en" ? "English" : "Spanish"
 }
 
+function isLikelySpanish(text: string): boolean {
+  const normalized = text.toLowerCase()
+  const strongMarks = /[áéíóúñ¿¡]/.test(normalized)
+  const commonWords = /\b(hola|gracias|por|para|que|con|sin|mensaje|responder|reunión|hoy|mañana|usted|vos|che)\b/.test(
+    normalized,
+  )
+
+  return strongMarks || commonWords
+}
+
 const SYSTEM_PROMPT = `You are EnCriollo, an assistant that helps people understand difficult texts and craft thoughtful replies.
 
 Rules:
@@ -83,6 +93,12 @@ export async function POST(req: Request) {
     const localeLabel = localeName(locale)
     const senderLabel =
       sender === "sender.other" ? senderOther : sender?.replace("sender.", "") || "unknown"
+    const inputIsSpanish = isLikelySpanish(text)
+    const languageInstruction = inputIsSpanish
+      ? "Respondé solo en español, sin duplicar contenido ni repetir la misma idea en otro idioma."
+      : "Respondé en español y también en el idioma original del input, en bloques con etiquetas claras para cada idioma."
+    const clarityInstruction =
+      "Usá estructura clara para usuario final (bloques y etiquetas claras), sin códigos de idioma crudos y sin tecnicismos confusos."
 
     if (mode === "understand") {
       const { simplicity = "simple", objective } = body
@@ -107,7 +123,8 @@ Instructions:
 - actions: What the user should do (empty array if nothing required)
 - alert: Only if manipulation/scam/risk detected, otherwise null
 - glossary: Only truly technical terms, empty array if none
-- ALL text must be in ${localeLabel}`
+- ${languageInstruction}
+- ${clarityInstruction}`
 
       const { text: responseText } = await generateText({
         model,
@@ -159,7 +176,8 @@ Instructions:
 - replyReason: Brief explanation of approach
 - alert: Only if received message shows manipulation/aggression/scam
 - summary: What the received message is asking/saying
-- ALL text must be in ${localeLabel}`
+- ${languageInstruction}
+- ${clarityInstruction}`
 
       const { text: responseText } = await generateText({
         model,
