@@ -163,9 +163,7 @@ export function UnifiedForm({ initialValues }: UnifiedFormProps) {
       })
     } catch (err) {
       const msg = err instanceof Error ? err.message : t("common.error.server")
-      const userMsg = msg.toLowerCase().includes("fetch")
-        ? t("common.error.network")
-        : msg
+      const userMsg = msg.toLowerCase().includes("fetch") ? t("common.error.network") : msg
 
       logEncriolloError({
         mode: (mode as "entender" | "responder") || "entender",

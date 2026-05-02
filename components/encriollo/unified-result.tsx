@@ -18,7 +18,9 @@ export function UnifiedResult({ data, mode }: UnifiedResultProps) {
     return (
       <div className="border-destructive/50 bg-destructive/10 mt-6 rounded-xl border-2 p-4">
         <p className="text-destructive text-sm font-semibold">Error</p>
-        <p className="text-destructive/90 mt-1 text-sm break-words whitespace-pre-wrap">{data.error}</p>
+        <p className="text-destructive/90 mt-1 text-sm break-words whitespace-pre-wrap">
+          {data.error}
+        </p>
       </div>
     )
   }

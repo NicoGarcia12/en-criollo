@@ -33,10 +33,7 @@ export function EnCriolloApp() {
         {/* key={historyKey} + initialValues={selectedEntry} hacen la magia:
             cuando key cambia, React re-monta el componente y useState
             toma los initialValues nuevos como punto de partida */}
-        <UnifiedForm
-          key={historyKey}
-          initialValues={selectedEntry ?? undefined}
-        />
+        <UnifiedForm key={historyKey} initialValues={selectedEntry ?? undefined} />
       </div>
       {/* Footer del card: historial alineado a la derecha, separado del form */}
       <div className="border-border/50 flex justify-end border-t px-4 py-3 sm:px-6">

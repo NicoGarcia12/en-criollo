@@ -1,6 +1,7 @@
 # OpenCode Session — 2026-05-01
 
 ## Pedido del usuario
+
 - Corregir layout mobile (superposición historial/botón)
 - Limpiar hack en footer
 - Crear y aplicar favicon/logo de gaucho
@@ -9,6 +10,7 @@
 - Reemplazar logo final por imagen provista en `E:\Repositorios`
 
 ## Registro de sesión (copiado a repo)
+
 1. Se movió `HistoryPanel` fuera de `absolute` en `components/encriollo/encriollo-app.tsx` y pasó a footer del card para evitar superposición en mobile.
 2. Se removió el hack de `startsWith("EnCriollo")` en `app/page.tsx` y se dejó render simple del disclaimer.
 3. Se ajustó metadata en `app/layout.tsx` para usar iconos personalizados.
@@ -20,7 +22,7 @@
    - Error UI con `break-words` y `whitespace-pre-wrap`
 7. Se agregó i18n para errores nuevos en ES/EN en `lib/i18n/dictionary.ts`.
 8. Se eliminó `debug` en error 500 de API (`app/api/encriollo/route.ts`).
-9. Se ejecutó quality gate local: `pnpm typecheck` y `pnpm lint` OK.
+9. Se ejecutó quality gate local: `npm run typecheck` y `npm run lint` OK.
 10. Se corrió QA manual de escenarios de error (subagente test-qa):
     - Fetch rejected (red caída) -> mensaje amigable, sin rotura mobile 375
     - 500 con error largo -> wrap correcto, sin overflow
@@ -33,4 +35,5 @@
     - Favicon: `app/layout.tsx`
 
 ## Nota
+
 - El usuario reportó necesidad de fondo transparente del PNG final; quedó pendiente por falta de herramientas de edición de imagen en entorno actual.

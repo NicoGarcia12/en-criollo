@@ -5,16 +5,19 @@ _Última actualización: 2026-05-01_
 ## 1) Cómo llegar a la sesión (contexto y trazabilidad)
 
 ### Archivos clave de esta sesión
+
 - Registro detallado de la sesión:
   - `knowledge/sessions/opencode-session-2026-05-01.md`
 - Resumen diario operativo:
   - `knowledge/daily/2026-05-01.md`
 
 ### Commit principal de cierre
+
 - Commit: `bd15869`
 - Mensaje: `feat: cerrar branding final y robustecer manejo de errores`
 
 ### Qué incluye ese estado
+
 - Logo final integrado en header + favicon:
   - `public/gaucho-logo-final.png`
   - `app/page.tsx`
@@ -46,28 +49,30 @@ Buscá `bd15869` en la lista.
 
 ---
 
-## 3) ¿Instalar con npm o pnpm?
+## 3) ¿Instalar con npm?
 
 ### Respuesta corta
-- **Usar `pnpm`**.
+
+- **Usar `npm`**.
 
 ### Por qué
-- Este proyecto ya está normalizado para `pnpm`.
-- Hay lockfile de pnpm (`pnpm-lock.yaml`).
-- En sesiones previas se removió `package-lock.json` para evitar conflictos de resolución.
+
+- Este proyecto está normalizado para `npm`.
+- El lockfile de referencia es `package-lock.json`.
+- Se removió el lockfile anterior para evitar mezclas de package managers.
 
 ### Instalación y ejecución
 
 ```bash
-pnpm install
-pnpm dev
+npm install
+npm run dev
 ```
 
 Quality gate recomendado:
 
 ```bash
-pnpm lint
-pnpm typecheck
+npm run lint
+npm run typecheck
 ```
 
 ---
@@ -75,21 +80,25 @@ pnpm typecheck
 ## 4) Cómo sincronizar agentes y skills otra vez
 
 Este repo guarda skills en:
+
 - `.opencode/skills/`
 
 Skills disponibles hoy:
+
 - `react-development`
 - `tailwind-css`
 - `testing-e2e`
 - `typescript-strict`
 
 ### Recomendación práctica de sincronización
+
 1. Confirmá que existe `.opencode/skills/` y sus `SKILL.md`.
 2. Si trabajás en otra máquina, traé siempre `main` actualizado.
 3. Si tenés un repo “hub” de agentes (por ej. `agentes-ia`), copiá cambios reutilizables desde acá hacia ese hub (y viceversa) manteniendo versiones alineadas.
 4. Si OpenCode no “ve” un skill nuevo, reiniciá sesión/IDE para refrescar el inventario de skills.
 
 ### Checklist rápido
+
 - [ ] `git pull` en `en-criollo`
 - [ ] verificar `.opencode/skills/*/SKILL.md`
 - [ ] validar que el orchestrator liste los skills esperados
@@ -100,6 +109,7 @@ Skills disponibles hoy:
 ## 5) Configurar Vercel como está ahora
 
 ### Estado actual conocido
+
 - Proyecto que funciona en producción:
   - `v0-encriollo-ai-assistant`
 - Team:
@@ -114,13 +124,16 @@ vercel link
 ```
 
 Seleccionar:
+
 - Scope/team: `nicogarcia12s-projects`
 - Project: `v0-encriollo-ai-assistant`
 
 Esto actualiza `.vercel/project.json` con el proyecto correcto.
 
 ### Variables de entorno
+
 En Vercel, configurar al menos:
+
 - `GROQ_API_KEY`
 
 Si no está, la API `/api/encriollo` puede fallar en runtime.
@@ -137,17 +150,20 @@ vercel --prod
 ## 6) Problemas comunes y solución rápida
 
 ### “No veo cambios de icono/logo/favicons”
+
 1. Hard refresh (`Ctrl+F5`)
 2. Cerrar y abrir pestaña
-3. Reiniciar `pnpm dev`
+3. Reiniciar `npm run dev`
 4. Verificar ruta directa del asset (`/gaucho-logo-final.png`)
 
 ### “404 en archivo nuevo de /public”
+
 1. Parar dev server
 2. Borrar `.next`
-3. Levantar de nuevo con `pnpm dev`
+3. Levantar de nuevo con `npm run dev`
 
 ### “Errores de API rompen UI”
+
 - Ya se robusteció en:
   - `unified-form.tsx` (network/server/invalid JSON)
   - `unified-result.tsx` (render seguro de texto largo)
@@ -157,13 +173,13 @@ vercel --prod
 ## 7) Comando mínimo para arrancar igual que hoy
 
 ```bash
-pnpm install && pnpm dev
+npm install && npm run dev
 ```
 
 Y para validar estado:
 
 ```bash
-pnpm lint && pnpm typecheck
+npm run lint && npm run typecheck
 ```
 
 ---
