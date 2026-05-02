@@ -10,10 +10,23 @@ This repository is linked to a [v0](https://v0.app) project. You can continue de
 
 ## Getting Started
 
-First, run the development server:
+First, run the development server (hot reload / watch):
+
+```bash
+npm start
+```
+
+Alternative (same behavior):
 
 ```bash
 npm run dev
+```
+
+To run a production server (after build):
+
+```bash
+npm run build
+npm run start:prod
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
