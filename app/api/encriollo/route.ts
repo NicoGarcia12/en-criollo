@@ -1,9 +1,10 @@
-import { generateText } from "ai"
-import { groq } from "@ai-sdk/groq"
+import {
+  generateWithGroqModelFallback,
+  GroqFallbackExhaustedError,
+} from "@/lib/server/groq-fallback"
 
 export const maxDuration = 60
 
-const model = groq("llama-3.3-70b-versatile")
 const MAX_INPUT_CHARS = 8000
 
 function safeJsonParse(jsonString: string, fallback: object = {}) {
@@ -127,11 +128,10 @@ Instructions:
 - ${languageInstruction}
 - ${clarityInstruction}`
 
-      const { text: responseText } = await generateText({
-        model,
-        system: SYSTEM_PROMPT,
+      const { text: responseText, modelUsed } = await generateWithGroqModelFallback(
+        SYSTEM_PROMPT,
         prompt,
-      })
+      )
 
       const result = safeJsonParse(responseText, {
         summary: locale === "en" ? "Could not process the text" : "No se pudo procesar el texto",
@@ -149,6 +149,7 @@ Instructions:
         glossary: result.glossary || [],
         reply: null,
         replyReason: null,
+        modelUsed,
       })
     }
 
@@ -180,11 +181,10 @@ Instructions:
 - ${languageInstruction}
 - ${clarityInstruction}`
 
-      const { text: responseText } = await generateText({
-        model,
-        system: SYSTEM_PROMPT,
+      const { text: responseText, modelUsed } = await generateWithGroqModelFallback(
+        SYSTEM_PROMPT,
         prompt,
-      })
+      )
 
       const result = safeJsonParse(responseText, {
         reply: locale === "en" ? "Could not generate reply" : "No se pudo generar la respuesta",
@@ -201,6 +201,7 @@ Instructions:
         glossary: null,
         reply: result.reply || null,
         replyReason: result.replyReason || null,
+        modelUsed,
       })
     }
 
@@ -209,6 +210,21 @@ Instructions:
       { status: 400 },
     )
   } catch (err) {
+    if (err instanceof GroqFallbackExhaustedError) {
+      console.error("[v0] Groq fallback agotado", {
+        trace: err.trace,
+      })
+
+      return Response.json(
+        {
+          error: "No se pudo obtener respuesta del proveedor LLM",
+          code: "GROQ_FALLBACK_EXHAUSTED",
+          trace: err.trace,
+        },
+        { status: 502 },
+      )
+    }
+
     const msg = err instanceof Error ? err.message : String(err)
     console.error("[v0] API error:", msg)
     return Response.json({ error: "Algo salió mal al procesar tu pedido" }, { status: 500 })

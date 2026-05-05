@@ -1,15 +1,11 @@
 import { POST } from "@/app/api/encriollo/route"
-import { generateText } from "ai"
+import { generateWithGroqModelFallback } from "@/lib/server/groq-fallback"
 
-jest.mock("ai", () => ({
-  generateText: jest.fn(),
+jest.mock("@/lib/server/groq-fallback", () => ({
+  generateWithGroqModelFallback: jest.fn(),
 }))
 
-jest.mock("@ai-sdk/groq", () => ({
-  groq: jest.fn(() => "mock-model"),
-}))
-
-const mockedGenerateText = jest.mocked(generateText)
+const mockedGenerateWithGroqModelFallback = jest.mocked(generateWithGroqModelFallback)
 
 describe("RED - API multilenguaje según idioma del input", () => {
   beforeEach(() => {
@@ -19,8 +15,8 @@ describe("RED - API multilenguaje según idioma del input", () => {
       json: (body: unknown, init?: { status?: number }) => ({ body, status: init?.status ?? 200 }),
     }
 
-    mockedGenerateText.mockReset()
-    mockedGenerateText.mockResolvedValue({
+    mockedGenerateWithGroqModelFallback.mockReset()
+    mockedGenerateWithGroqModelFallback.mockResolvedValue({
       text: JSON.stringify({
         summary: "ok",
         keyPoints: [],
@@ -28,7 +24,8 @@ describe("RED - API multilenguaje según idioma del input", () => {
         alert: null,
         glossary: [],
       }),
-    } as Awaited<ReturnType<typeof generateText>>)
+      modelUsed: "mock-model",
+    })
   })
 
   it("si el input está en inglés, debería pedir salida bilingüe (español + idioma original)", async () => {
@@ -44,8 +41,8 @@ describe("RED - API multilenguaje según idioma del input", () => {
 
     await POST(req)
 
-    const call = mockedGenerateText.mock.calls[0]?.[0]
-    expect(call.prompt).toMatch(/español.*idioma original/i)
+    const call = mockedGenerateWithGroqModelFallback.mock.calls[0]
+    expect(call?.[1]).toMatch(/español.*idioma original/i)
   })
 
   it("si el input está en español, debería pedir respuesta al menos en español sin duplicar", async () => {
@@ -61,9 +58,9 @@ describe("RED - API multilenguaje según idioma del input", () => {
 
     await POST(req)
 
-    const call = mockedGenerateText.mock.calls[0]?.[0]
-    expect(call.prompt).toMatch(/solo en español|únicamente en español/i)
-    expect(call.prompt).toMatch(/sin duplic/i)
+    const call = mockedGenerateWithGroqModelFallback.mock.calls[0]
+    expect(call?.[1]).toMatch(/solo en español|únicamente en español/i)
+    expect(call?.[1]).toMatch(/sin duplic/i)
   })
 
   it("debería forzar estructura clara para usuario final y evitar códigos de idioma crudos o mezclas confusas", async () => {
@@ -81,9 +78,9 @@ describe("RED - API multilenguaje según idioma del input", () => {
 
     await POST(req)
 
-    const call = mockedGenerateText.mock.calls[0]?.[0]
-    expect(call.prompt).toMatch(/estructura clara|bloques|etiquetas claras/i)
-    expect(call.prompt).toMatch(/evitar.*códigos de idioma|sin códigos de idioma/i)
-    expect(call.prompt).toMatch(/sin tecnicismos confusos|texto técnico confuso/i)
+    const call = mockedGenerateWithGroqModelFallback.mock.calls[0]
+    expect(call?.[1]).toMatch(/estructura clara|bloques|etiquetas claras/i)
+    expect(call?.[1]).toMatch(/evitar.*códigos de idioma|sin códigos de idioma/i)
+    expect(call?.[1]).toMatch(/sin tecnicismos confusos|texto técnico confuso/i)
   })
 })
