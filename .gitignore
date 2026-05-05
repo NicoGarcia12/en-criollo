@@ -15,5 +15,6 @@ next.user-config.*
 node_modules
 .next/
 *.tsbuildinfo
+groq_validation_results.json
 .DS_Store
 .vercel
