@@ -56,9 +56,9 @@ describe("groq fallback", () => {
     )
   })
 })
-  function mockFetchResponse(status: number, payload: unknown): Response {
-    return {
-      status,
-      json: async () => payload,
-    } as Response
-  }
+function mockFetchResponse(status: number, payload: unknown): Response {
+  return {
+    status,
+    json: async () => payload,
+  } as Response
+}
