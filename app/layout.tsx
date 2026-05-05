@@ -3,6 +3,7 @@ import { Plus_Jakarta_Sans, Geist_Mono } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
 import { Toaster } from "@/components/ui/sonner"
 import { LocaleProvider } from "@/lib/i18n/locale-context"
+import { siteUrl } from "@/lib/site-url"
 import "./globals.css"
 
 const jakarta = Plus_Jakarta_Sans({
@@ -18,9 +19,13 @@ const geistMono = Geist_Mono({
 })
 
 export const metadata: Metadata = {
+  metadataBase: new URL(siteUrl),
   title: "EnCriollo",
   description:
     "Pegá un texto difícil y te decimos qué significa, qué importa y qué hacer. O pegá un mensaje incómodo y te ayudamos a responder claro y sin quedar mal.",
+  alternates: {
+    canonical: "/",
+  },
   icons: {
     icon: "/gaucho-logo-final.png",
     shortcut: "/gaucho-logo-final.png",
