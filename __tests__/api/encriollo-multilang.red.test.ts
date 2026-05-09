@@ -1,11 +1,11 @@
 import { POST } from "@/app/api/encriollo/route"
-import { generateWithGroqModelFallback } from "@/lib/server/groq-fallback"
+import { generateWithLlmModelFallback } from "@/lib/server/llm-fallback"
 
-jest.mock("@/lib/server/groq-fallback", () => ({
-  generateWithGroqModelFallback: jest.fn(),
+jest.mock("@/lib/server/llm-fallback", () => ({
+  generateWithLlmModelFallback: jest.fn(),
 }))
 
-const mockedGenerateWithGroqModelFallback = jest.mocked(generateWithGroqModelFallback)
+const mockedGenerateWithLlmModelFallback = jest.mocked(generateWithLlmModelFallback)
 
 describe("RED - API multilenguaje según idioma del input", () => {
   beforeEach(() => {
@@ -15,8 +15,8 @@ describe("RED - API multilenguaje según idioma del input", () => {
       json: (body: unknown, init?: { status?: number }) => ({ body, status: init?.status ?? 200 }),
     }
 
-    mockedGenerateWithGroqModelFallback.mockReset()
-    mockedGenerateWithGroqModelFallback.mockResolvedValue({
+    mockedGenerateWithLlmModelFallback.mockReset()
+    mockedGenerateWithLlmModelFallback.mockResolvedValue({
       text: JSON.stringify({
         summary: "ok",
         keyPoints: [],
@@ -41,7 +41,7 @@ describe("RED - API multilenguaje según idioma del input", () => {
 
     await POST(req)
 
-    const call = mockedGenerateWithGroqModelFallback.mock.calls[0]
+    const call = mockedGenerateWithLlmModelFallback.mock.calls[0]
     expect(call?.[1]).toMatch(/español.*idioma original/i)
   })
 
@@ -58,7 +58,7 @@ describe("RED - API multilenguaje según idioma del input", () => {
 
     await POST(req)
 
-    const call = mockedGenerateWithGroqModelFallback.mock.calls[0]
+    const call = mockedGenerateWithLlmModelFallback.mock.calls[0]
     expect(call?.[1]).toMatch(/solo en español|únicamente en español/i)
     expect(call?.[1]).toMatch(/sin duplic/i)
   })
@@ -78,7 +78,7 @@ describe("RED - API multilenguaje según idioma del input", () => {
 
     await POST(req)
 
-    const call = mockedGenerateWithGroqModelFallback.mock.calls[0]
+    const call = mockedGenerateWithLlmModelFallback.mock.calls[0]
     expect(call?.[1]).toMatch(/estructura clara|bloques|etiquetas claras/i)
     expect(call?.[1]).toMatch(/evitar.*códigos de idioma|sin códigos de idioma/i)
     expect(call?.[1]).toMatch(/sin tecnicismos confusos|texto técnico confuso/i)
