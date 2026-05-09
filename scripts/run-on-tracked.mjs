@@ -1,4 +1,5 @@
 import { spawnSync, execFileSync } from "node:child_process"
+import fs from "node:fs"
 import path from "node:path"
 
 const [, , tool, ...toolArgs] = process.argv
@@ -16,32 +17,19 @@ const tracked = execFileSync("git", ["ls-files", ":(exclude).opencode/**"], {
   .split("\n")
   .map((entry) => entry.trim())
   .filter(Boolean)
+  .filter((entry) => fs.existsSync(path.join(repoRoot, entry)))
 
-const eslintExtensions = new Set([
-  ".js",
-  ".mjs",
-  ".cjs",
-  ".jsx",
-  ".ts",
-  ".mts",
-  ".cts",
-  ".tsx",
-])
+const eslintExtensions = new Set([".js", ".mjs", ".cjs", ".jsx", ".ts", ".mts", ".cts", ".tsx"])
 
 const files =
-  tool === "eslint"
-    ? tracked.filter((file) => eslintExtensions.has(path.extname(file)))
-    : tracked
+  tool === "eslint" ? tracked.filter((file) => eslintExtensions.has(path.extname(file))) : tracked
 
 if (files.length === 0) {
   console.log(`No tracked files to process for ${tool}.`)
   process.exit(0)
 }
 
-const baseArgs =
-  tool === "prettier"
-    ? ["--ignore-unknown"]
-    : ["--no-warn-ignored"]
+const baseArgs = tool === "prettier" ? ["--ignore-unknown"] : ["--no-warn-ignored"]
 const result = spawnSync(tool, [...baseArgs, ...toolArgs, ...files], {
   cwd: repoRoot,
   stdio: "inherit",
