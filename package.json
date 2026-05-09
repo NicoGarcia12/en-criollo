@@ -8,11 +8,13 @@
     "start": "next dev",
     "start:prod": "next start",
     "test": "jest",
-    "lint": "eslint .",
-    "lint:fix": "eslint . --fix",
-    "format": "prettier --write .",
-    "format:check": "prettier --check .",
-    "typecheck": "tsc --noEmit"
+    "lint": "node scripts/run-on-tracked.mjs eslint",
+    "lint:fix": "node scripts/run-on-tracked.mjs eslint --fix",
+    "format": "node scripts/run-on-tracked.mjs prettier --write",
+    "format:check": "node scripts/run-on-tracked.mjs prettier --check",
+    "typecheck": "tsc --noEmit",
+    "quality:gate:fast": "npm run format:check && npm run lint && npm run typecheck",
+    "quality:gate": "npm run quality:gate:fast && npm run build"
   },
   "dependencies": {
     "@ai-sdk/groq": "^2.0.0",

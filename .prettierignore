@@ -1,5 +1,6 @@
 node_modules
 .next
+.opencode
 pnpm-lock.yaml
 package-lock.json
 tsconfig.tsbuildinfo
