@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { Input } from "@/components/ui/input"
@@ -19,6 +19,60 @@ import { UnifiedResult } from "./unified-result"
 import { logEncriolloError } from "./error-logger"
 import { addToHistory } from "./history-store"
 import type { HistoryEntry, UnifiedOutput } from "./types"
+
+const RATE_LIMIT_MAX_REQUESTS = 15
+const RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000
+const RATE_LIMIT_STORAGE_KEY = "encriollo:frontend-rate-limit:v1"
+
+interface RateLimitSnapshot {
+  attempts: number[]
+  blocked: boolean
+  remainingMs: number
+}
+
+function readRateLimitAttempts(): number[] {
+  // localStorage viene de un borde externo: validamos forma y tipos.
+  const rawValue = localStorage.getItem(RATE_LIMIT_STORAGE_KEY)
+  if (!rawValue) return []
+
+  try {
+    const parsed: unknown = JSON.parse(rawValue)
+    if (!Array.isArray(parsed)) return []
+
+    return parsed.filter((value): value is number => Number.isFinite(value) && value > 0)
+  } catch {
+    return []
+  }
+}
+
+function writeRateLimitAttempts(attempts: number[]): void {
+  localStorage.setItem(RATE_LIMIT_STORAGE_KEY, JSON.stringify(attempts))
+}
+
+function getRateLimitSnapshot(nowMs: number): RateLimitSnapshot {
+  const attempts = readRateLimitAttempts().filter(
+    (timestamp) => nowMs - timestamp < RATE_LIMIT_WINDOW_MS,
+  )
+
+  writeRateLimitAttempts(attempts)
+
+  if (attempts.length < RATE_LIMIT_MAX_REQUESTS) {
+    return { attempts, blocked: false, remainingMs: 0 }
+  }
+
+  // Ventana rolling: desbloquea cuando el intento más viejo sale de la ventana de 1h.
+  const oldestAttempt = attempts[0]
+  const remainingMs = Math.max(0, oldestAttempt + RATE_LIMIT_WINDOW_MS - nowMs)
+
+  return { attempts, blocked: remainingMs > 0, remainingMs }
+}
+
+function formatRemainingTime(remainingMs: number): string {
+  const totalSeconds = Math.max(0, Math.ceil(remainingMs / 1000))
+  const minutes = Math.floor(totalSeconds / 60)
+  const seconds = totalSeconds % 60
+  return `${minutes}:${String(seconds).padStart(2, "0")}`
+}
 
 // Opciones de remitente (para ambos modos)
 const SENDERS = [
@@ -88,6 +142,47 @@ export function UnifiedForm({ initialValues }: UnifiedFormProps) {
   // Estado de UI
   const [loading, setLoading] = useState(false)
   const [result, setResult] = useState<UnifiedOutput | null>(null)
+  const [remainingBlockMs, setRemainingBlockMs] = useState<number>(() => {
+    const snapshot = getRateLimitSnapshot(Date.now())
+    return snapshot.blocked ? snapshot.remainingMs : 0
+  })
+
+  const showFrontendRateLimit = useCallback(
+    (remainingMs: number): void => {
+      const maybeTranslated = t("common.error.rateLimit")
+      const baseMessage =
+        maybeTranslated !== "common.error.rateLimit"
+          ? maybeTranslated
+          : "Límite de solicitudes alcanzado. Esperá antes de volver a enviar."
+
+      setResult({
+        error: `${baseMessage} (${formatRemainingTime(remainingMs)})`,
+        errorCode: "rate_limit",
+      } as UnifiedOutput)
+    },
+    [t],
+  )
+
+  useEffect(() => {
+    if (remainingBlockMs <= 0) return
+
+    // Countdown reactivo con cleanup para evitar pérdidas de memoria.
+    const intervalId = window.setInterval(() => {
+      const snapshot = getRateLimitSnapshot(Date.now())
+
+      if (!snapshot.blocked) {
+        setRemainingBlockMs(0)
+        return
+      }
+
+      setRemainingBlockMs(snapshot.remainingMs)
+      showFrontendRateLimit(snapshot.remainingMs)
+    }, 1000)
+
+    return () => window.clearInterval(intervalId)
+  }, [remainingBlockMs, showFrontendRateLimit])
+
+  const isFrontendBlocked = remainingBlockMs > 0
 
   const canSubmit =
     text.trim().length > 0 &&
@@ -98,6 +193,17 @@ export function UnifiedForm({ initialValues }: UnifiedFormProps) {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (!canSubmit) return
+
+    const preSubmitSnapshot = getRateLimitSnapshot(Date.now())
+    if (preSubmitSnapshot.blocked) {
+      setRemainingBlockMs(preSubmitSnapshot.remainingMs)
+      showFrontendRateLimit(preSubmitSnapshot.remainingMs)
+      return
+    }
+
+    // Registramos el intento ANTES del request para que el límite sea por envíos
+    // y no dependa de la respuesta del backend.
+    writeRateLimitAttempts([...preSubmitSnapshot.attempts, Date.now()])
 
     setLoading(true)
     setResult(null)
@@ -443,7 +549,7 @@ export function UnifiedForm({ initialValues }: UnifiedFormProps) {
         <Button
           type="submit"
           form="unified-form"
-          disabled={!canSubmit || loading}
+          disabled={!canSubmit || loading || isFrontendBlocked}
           size="lg"
           className="w-full max-w-xs"
         >
