@@ -28,6 +28,7 @@ const config = tseslint.config(
     ignores: [
       "node_modules/**",
       ".next/**",
+      ".opencode/**",
       "next.config.mjs",
       "postcss.config.mjs",
       "tsconfig.tsbuildinfo",
