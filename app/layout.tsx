@@ -27,9 +27,11 @@ export const metadata: Metadata = {
     canonical: "/",
   },
   icons: {
-    icon: "/gaucho-logo-final.png",
-    shortcut: "/gaucho-logo-final.png",
-    apple: "/gaucho-logo-final.png",
+    // Reversión del ajuste de mitigación: volvemos al ícono previo.
+    icon: "/logo-gaucho-head.jpg",
+    shortcut: "/logo-gaucho-head.jpg",
+    // Apple touch icon mantiene PNG dedicado para compatibilidad iOS.
+    apple: "/apple-icon.png",
   },
 }
 

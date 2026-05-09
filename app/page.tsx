@@ -8,15 +8,16 @@ export default function HomePage() {
   const { t } = useLocale()
 
   return (
-    <main className="bg-background min-h-screen">
+    <main className="bg-background min-h-screen overflow-x-hidden">
       <header className="border-border/60 bg-background/80 sticky top-0 z-30 border-b backdrop-blur">
         <div className="mx-auto flex max-w-4xl items-center justify-between gap-2 px-4 py-4">
           <div className="flex items-center gap-2">
             <Image
-              src="/gaucho-logo-final.png"
+              // Reversión: volvemos al logo anterior al ajuste de mitigación.
+              src="/logo-gaucho-head.jpg"
               alt="EnCriollo"
-              width={52}
-              height={52}
+              width={56}
+              height={56}
               className="rounded-lg"
               priority
             />
@@ -42,7 +43,7 @@ export default function HomePage() {
       </section>
 
       <footer className="border-border/60 border-t">
-        <div className="text-muted-foreground mx-auto flex max-w-4xl flex-col gap-4 px-4 py-6 text-xs sm:flex-row sm:flex-wrap sm:items-end sm:justify-between">
+        <div className="text-muted-foreground mx-auto flex max-w-4xl flex-col gap-4 px-4 py-6 text-xs md:flex-col md:items-start lg:flex-row lg:flex-wrap lg:items-end lg:justify-between">
           <p>
             {/*
               Aplicamos el color neón SOLO al texto de marca del lado izquierdo,
@@ -51,7 +52,7 @@ export default function HomePage() {
             <span style={{ color: "var(--neon)" }}>En Criollo</span>{" "}
             {t("footer.disclaimer").replace(/^EnCriollo\s*/i, "")}
           </p>
-          <p className="sm:ml-auto sm:text-right">{t("footer.made")}</p>
+          <p className="md:self-start lg:ml-auto lg:text-right">{t("footer.made")}</p>
         </div>
       </footer>
     </main>

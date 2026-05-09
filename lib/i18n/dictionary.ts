@@ -12,7 +12,10 @@ export const DICT = {
     "app.start": "Empezar",
     "app.badge": "Mini herramienta con IA",
     "footer.disclaimer": "EnCriollo no reemplaza asesoramiento legal, médico o financiero.",
-    "footer.made": "Hecho por Nicolás García · Referencia conceptual: Zero to Agent.",
+    "footer.made": "Desarrollado por Nicolás García para Zero To Agent · Vercel Hackathon",
+    "common.error.rateLimit":
+      "Alta demanda detectada. Para prevenir inconsistencias, detené el flujo y reintentá más tarde.",
+    "common.close": "Cerrar",
 
     // Unified form
     "uf.text.label": "Tu texto",

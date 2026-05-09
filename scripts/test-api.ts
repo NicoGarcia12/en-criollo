@@ -1,10 +1,11 @@
+import { siteUrl } from "../lib/site-url"
+
 // Test script para verificar que la API de EnCriollo funciona
 // Ejecutar con: npx tsx scripts/test-api.ts
 
 async function testEncriolloAPI() {
-  const _baseUrl = process.env.VERCEL_URL
-    ? `https://${process.env.VERCEL_URL}`
-    : "http://localhost:3000"
+  // Didáctico: reutilizamos la misma fuente única de verdad del proyecto.
+  const _baseUrl = siteUrl
 
   console.log("[v0] Testing EnCriollo API...")
   console.log("[v0] OPENAI_API_KEY exists:", !!process.env.OPENAI_API_KEY)

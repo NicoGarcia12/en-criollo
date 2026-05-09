@@ -13,8 +13,33 @@ interface UnifiedResultProps {
 
 export function UnifiedResult({ data, mode }: UnifiedResultProps) {
   const { t } = useLocale()
+  const [isRateLimitVisible, setIsRateLimitVisible] = useState(true)
 
   if ("error" in data && data.error) {
+    if (data.errorCode === "rate_limit") {
+      if (!isRateLimitVisible) return null
+
+      return (
+        <div className="border-destructive/50 bg-destructive/10 mt-6 rounded-xl border-2 p-4">
+          {/* Sin título: por requerimiento de negocio, mostramos solo cuerpo + CTA */}
+          <p className="text-destructive/90 text-sm break-words whitespace-pre-wrap">
+            {data.error}
+          </p>
+          <div className="mt-3">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="border-destructive/40 text-destructive hover:bg-destructive/15"
+              onClick={() => setIsRateLimitVisible(false)}
+            >
+              {t("common.close")}
+            </Button>
+          </div>
+        </div>
+      )
+    }
+
     return (
       <div className="border-destructive/50 bg-destructive/10 mt-6 rounded-xl border-2 p-4">
         <p className="text-destructive text-sm font-semibold">Error</p>

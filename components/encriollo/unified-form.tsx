@@ -137,6 +137,17 @@ export function UnifiedForm({ initialValues }: UnifiedFormProps) {
       }
 
       if (!res.ok) {
+        if (res.status === 429) {
+          // Caso especial de alta demanda/límite de pedidos.
+          // Guardamos un código para que la UI reutilice la estética de error,
+          // pero con comportamiento/copy específico (sin título + botón Cerrar).
+          setResult({
+            error: t("common.error.rateLimit"),
+            errorCode: "rate_limit",
+          } as UnifiedOutput)
+          return
+        }
+
         const apiError =
           typeof data === "object" && data !== null && "error" in data
             ? String((data as { error?: string }).error || "")

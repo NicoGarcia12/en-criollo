@@ -6,6 +6,7 @@ export interface UnifiedOutput {
   alert: string | null
   glossary: Array<{ term: string; meaning: string }> | null
   error?: string
+  errorCode?: "rate_limit"
 
   // Modo entender
   keyPoints: string[] | null
