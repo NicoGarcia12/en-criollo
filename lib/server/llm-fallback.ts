@@ -1,14 +1,14 @@
-interface GroqMessage {
+interface LlmMessage {
   role: "system" | "user"
   content: string
 }
 
-interface GroqChatCompletionRequest {
+interface LlmChatCompletionRequest {
   model: string
-  messages: GroqMessage[]
+  messages: LlmMessage[]
 }
 
-interface GroqChatCompletionResponse {
+interface LlmChatCompletionResponse {
   choices?: Array<{
     message?: {
       content?: string | null
@@ -16,28 +16,28 @@ interface GroqChatCompletionResponse {
   }>
 }
 
-export interface GroqFallbackSuccess {
+export interface LlmFallbackSuccess {
   text: string
   modelUsed: string
 }
 
-interface GroqFallbackErrorTrace {
+interface LlmFallbackErrorTrace {
   model: string
   reason: string
   status?: number
 }
 
-export class GroqFallbackExhaustedError extends Error {
-  public readonly trace: GroqFallbackErrorTrace[]
+export class LlmFallbackExhaustedError extends Error {
+  public readonly trace: LlmFallbackErrorTrace[]
 
-  public constructor(message: string, trace: GroqFallbackErrorTrace[]) {
+  public constructor(message: string, trace: LlmFallbackErrorTrace[]) {
     super(message)
-    this.name = "GroqFallbackExhaustedError"
+    this.name = "LlmFallbackExhaustedError"
     this.trace = trace
   }
 }
 
-const DEFAULT_BASE_URL = "https://api.groq.com/openai/v1"
+const DEFAULT_BASE_URL = "https://api.openai.com/v1"
 const REQUEST_TIMEOUT_MS = 12_000
 
 function getEnv(name: string): string {
@@ -56,7 +56,7 @@ function isUsefulContent(content: unknown): content is string {
 }
 
 function parseCompletionText(payload: unknown): string | null {
-  const data = payload as GroqChatCompletionResponse
+  const data = payload as LlmChatCompletionResponse
   const content = data.choices?.[0]?.message?.content
   return isUsefulContent(content) ? content : null
 }
@@ -64,7 +64,7 @@ function parseCompletionText(payload: unknown): string | null {
 async function postChatCompletion(
   baseUrl: string,
   apiKey: string,
-  body: GroqChatCompletionRequest,
+  body: LlmChatCompletionRequest,
 ): Promise<Response> {
   const controller = new AbortController()
 
@@ -88,27 +88,27 @@ async function postChatCompletion(
   }
 }
 
-export async function generateWithGroqModelFallback(
+export async function generateWithLlmModelFallback(
   system: string,
   prompt: string,
-): Promise<GroqFallbackSuccess> {
-  const apiKey = getEnv("GROQ_API_KEY")
-  const baseUrl = getEnv("GROQ_BASE_URL") || DEFAULT_BASE_URL
-  const modelChain = getModelChain(getEnv("GROQ_MODEL_CHAIN"))
+): Promise<LlmFallbackSuccess> {
+  const apiKey = getEnv("LLM_API_KEY")
+  const baseUrl = getEnv("LLM_BASE_URL") || DEFAULT_BASE_URL
+  const modelChain = getModelChain(getEnv("LLM_MODEL_CHAIN"))
 
   if (!apiKey) {
-    throw new Error("GROQ_API_KEY no está configurada")
+    throw new Error("LLM_API_KEY no está configurada")
   }
 
   if (modelChain.length === 0) {
-    throw new Error("GROQ_MODEL_CHAIN está vacío o inválido")
+    throw new Error("LLM_MODEL_CHAIN está vacío o inválido")
   }
 
-  const trace: GroqFallbackErrorTrace[] = []
+  const trace: LlmFallbackErrorTrace[] = []
 
   for (const model of modelChain) {
     try {
-      console.info(`[groq-fallback] Intentando modelo: ${model}`)
+      console.info(`[llm-fallback] Intentando modelo: ${model}`)
 
       const response = await postChatCompletion(baseUrl, apiKey, {
         model,
@@ -129,7 +129,7 @@ export async function generateWithGroqModelFallback(
           status: response.status,
         })
 
-        console.warn(`[groq-fallback] Modelo ${model} respondió HTTP ${response.status}`)
+        console.warn(`[llm-fallback] Modelo ${model} respondió HTTP ${response.status}`)
         continue
       }
 
@@ -138,11 +138,11 @@ export async function generateWithGroqModelFallback(
 
       if (!text) {
         trace.push({ model, reason: "empty_content", status: response.status })
-        console.warn(`[groq-fallback] Modelo ${model} devolvió contenido vacío`)
+        console.warn(`[llm-fallback] Modelo ${model} devolvió contenido vacío`)
         continue
       }
 
-      console.info(`[groq-fallback] Éxito con modelo: ${model}`)
+      console.info(`[llm-fallback] Éxito con modelo: ${model}`)
       return { text, modelUsed: model }
     } catch (error) {
       const reason =
@@ -153,9 +153,9 @@ export async function generateWithGroqModelFallback(
             : "unknown_error"
 
       trace.push({ model, reason })
-      console.warn(`[groq-fallback] Error en modelo ${model}: ${reason}`)
+      console.warn(`[llm-fallback] Error en modelo ${model}: ${reason}`)
     }
   }
 
-  throw new GroqFallbackExhaustedError("Fallaron todos los modelos de GROQ_MODEL_CHAIN", trace)
+  throw new LlmFallbackExhaustedError("Fallaron todos los modelos de LLM_MODEL_CHAIN", trace)
 }

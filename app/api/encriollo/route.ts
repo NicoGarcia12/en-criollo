@@ -1,7 +1,4 @@
-import {
-  generateWithGroqModelFallback,
-  GroqFallbackExhaustedError,
-} from "@/lib/server/groq-fallback"
+import { generateWithLlmModelFallback, LlmFallbackExhaustedError } from "@/lib/server/llm-fallback"
 
 export const maxDuration = 60
 
@@ -128,7 +125,7 @@ Instructions:
 - ${languageInstruction}
 - ${clarityInstruction}`
 
-      const { text: responseText, modelUsed } = await generateWithGroqModelFallback(
+      const { text: responseText, modelUsed } = await generateWithLlmModelFallback(
         SYSTEM_PROMPT,
         prompt,
       )
@@ -181,7 +178,7 @@ Instructions:
 - ${languageInstruction}
 - ${clarityInstruction}`
 
-      const { text: responseText, modelUsed } = await generateWithGroqModelFallback(
+      const { text: responseText, modelUsed } = await generateWithLlmModelFallback(
         SYSTEM_PROMPT,
         prompt,
       )
@@ -210,15 +207,15 @@ Instructions:
       { status: 400 },
     )
   } catch (err) {
-    if (err instanceof GroqFallbackExhaustedError) {
-      console.error("[v0] Groq fallback agotado", {
+    if (err instanceof LlmFallbackExhaustedError) {
+      console.error("[v0] LLM fallback agotado", {
         trace: err.trace,
       })
 
       return Response.json(
         {
           error: "No se pudo obtener respuesta del proveedor LLM",
-          code: "GROQ_FALLBACK_EXHAUSTED",
+          code: "LLM_FALLBACK_EXHAUSTED",
           trace: err.trace,
         },
         { status: 502 },
