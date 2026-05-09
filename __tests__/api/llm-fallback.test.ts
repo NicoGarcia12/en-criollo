@@ -1,18 +1,18 @@
 import {
-  generateWithGroqModelFallback,
-  GroqFallbackExhaustedError,
-} from "@/lib/server/groq-fallback"
+  generateWithLlmModelFallback,
+  LlmFallbackExhaustedError,
+} from "@/lib/server/llm-fallback"
 
-describe("groq fallback", () => {
+describe("llm fallback", () => {
   const originalEnv = process.env
 
   beforeEach(() => {
     jest.resetAllMocks()
     process.env = {
       ...originalEnv,
-      GROQ_API_KEY: "test-key",
-      GROQ_BASE_URL: "https://api.groq.com/openai/v1",
-      GROQ_MODEL_CHAIN: "model-a, model-b",
+      LLM_API_KEY: "test-key",
+      LLM_BASE_URL: "https://api.groq.com/openai/v1",
+      LLM_MODEL_CHAIN: "model-a, model-b",
     }
   })
 
@@ -32,7 +32,7 @@ describe("groq fallback", () => {
 
     global.fetch = fetchMock as typeof fetch
 
-    const result = await generateWithGroqModelFallback("system", "prompt")
+    const result = await generateWithLlmModelFallback("system", "prompt")
 
     expect(result.modelUsed).toBe("model-b")
     expect(result.text).toBe("respuesta final")
@@ -51,10 +51,11 @@ describe("groq fallback", () => {
 
     global.fetch = fetchMock as typeof fetch
 
-    await expect(generateWithGroqModelFallback("system", "prompt")).rejects.toBeInstanceOf(
-      GroqFallbackExhaustedError,
+    await expect(generateWithLlmModelFallback("system", "prompt")).rejects.toBeInstanceOf(
+      LlmFallbackExhaustedError,
     )
   })
+
 })
 function mockFetchResponse(status: number, payload: unknown): Response {
   return {
