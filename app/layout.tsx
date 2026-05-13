@@ -28,8 +28,8 @@ export const metadata: Metadata = {
   },
   icons: {
     // Reversión del ajuste de mitigación: volvemos al ícono previo.
-    icon: "/logo-gaucho-head.jpg",
-    shortcut: "/logo-gaucho-head.jpg",
+    icon: "/logo-en-criollo.png",
+    shortcut: "/logo-en-criollo.png",
     // Apple touch icon mantiene PNG dedicado para compatibilidad iOS.
     apple: "/apple-icon.png",
   },

@@ -13,12 +13,11 @@ export default function HomePage() {
         <div className="mx-auto flex max-w-4xl items-center justify-between gap-2 px-4 py-4">
           <div className="flex items-center gap-2">
             <Image
-              // Reversión: volvemos al logo anterior al ajuste de mitigación.
-              src="/logo-gaucho-head.jpg"
+              src="/logo-en-criollo.png"
               alt="EnCriollo"
               width={56}
               height={56}
-              className="rounded-lg"
+              className="h-auto w-auto rounded-lg"
               priority
             />
             <div className="leading-tight">
