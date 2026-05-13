@@ -20,6 +20,67 @@ import { logEncriolloError } from "./error-logger"
 import { addToHistory } from "./history-store"
 import type { HistoryEntry, UnifiedOutput } from "./types"
 
+const RATE_LIMIT_MAX_REQUESTS = 15
+const RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000
+const RATE_LIMIT_STORAGE_KEY = "encriollo:frontend-rate-limit:v1"
+
+interface RateLimitSnapshot {
+  attempts: number[]
+  blocked: boolean
+  remainingMs: number
+}
+
+function canUseLocalStorage(): boolean {
+  return typeof window !== "undefined" && typeof window.localStorage !== "undefined"
+}
+
+function readRateLimitAttempts(): number[] {
+  if (!canUseLocalStorage()) return []
+
+  // localStorage viene de un borde externo: validamos forma y tipos.
+  const rawValue = localStorage.getItem(RATE_LIMIT_STORAGE_KEY)
+  if (!rawValue) return []
+
+  try {
+    const parsed: unknown = JSON.parse(rawValue)
+    if (!Array.isArray(parsed)) return []
+
+    return parsed.filter((value): value is number => Number.isFinite(value) && value > 0)
+  } catch {
+    return []
+  }
+}
+
+function writeRateLimitAttempts(attempts: number[]): void {
+  if (!canUseLocalStorage()) return
+
+  localStorage.setItem(RATE_LIMIT_STORAGE_KEY, JSON.stringify(attempts))
+}
+
+function getRateLimitSnapshot(nowMs: number): RateLimitSnapshot {
+  const attempts = readRateLimitAttempts().filter(
+    (timestamp) => nowMs - timestamp < RATE_LIMIT_WINDOW_MS,
+  )
+
+  writeRateLimitAttempts(attempts)
+
+  if (attempts.length < RATE_LIMIT_MAX_REQUESTS) {
+    return { attempts, blocked: false, remainingMs: 0 }
+  }
+
+  // Ventana rolling: desbloquea cuando el intento más viejo sale de la ventana de 1h.
+  const oldestAttempt = attempts[0]
+  const remainingMs = Math.max(0, oldestAttempt + RATE_LIMIT_WINDOW_MS - nowMs)
+
+  return { attempts, blocked: remainingMs > 0, remainingMs }
+}
+
+function formatRemainingTime(remainingMs: number): string {
+  const totalSeconds = Math.max(0, Math.ceil(remainingMs / 1000))
+  const minutes = Math.floor(totalSeconds / 60)
+  const seconds = totalSeconds % 60
+  return `${minutes}:${String(seconds).padStart(2, "0")}`
+}
 // Opciones de remitente (para ambos modos)
 const SENDERS = [
   "sender.unknown",

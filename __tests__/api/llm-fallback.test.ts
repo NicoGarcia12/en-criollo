@@ -1,7 +1,4 @@
-import {
-  generateWithLlmModelFallback,
-  LlmFallbackExhaustedError,
-} from "@/lib/server/llm-fallback"
+import { generateWithLlmModelFallback, LlmFallbackExhaustedError } from "@/lib/server/llm-fallback"
 
 describe("llm fallback", () => {
   const originalEnv = process.env
@@ -55,7 +52,6 @@ describe("llm fallback", () => {
       LlmFallbackExhaustedError,
     )
   })
-
 })
 function mockFetchResponse(status: number, payload: unknown): Response {
   return {
