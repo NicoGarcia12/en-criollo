@@ -30,7 +30,13 @@ interface RateLimitSnapshot {
   remainingMs: number
 }
 
+function canUseLocalStorage(): boolean {
+  return typeof window !== "undefined" && typeof window.localStorage !== "undefined"
+}
+
 function readRateLimitAttempts(): number[] {
+  if (!canUseLocalStorage()) return []
+
   // localStorage viene de un borde externo: validamos forma y tipos.
   const rawValue = localStorage.getItem(RATE_LIMIT_STORAGE_KEY)
   if (!rawValue) return []
@@ -46,6 +52,8 @@ function readRateLimitAttempts(): number[] {
 }
 
 function writeRateLimitAttempts(attempts: number[]): void {
+  if (!canUseLocalStorage()) return
+
   localStorage.setItem(RATE_LIMIT_STORAGE_KEY, JSON.stringify(attempts))
 }
 
