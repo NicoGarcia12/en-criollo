@@ -1,0 +1,11 @@
+﻿{
+    "status":  "ok",
+    "importedCount":  66,
+    "deletedKnowledgeDir":  true,
+    "backupCreated":  false,
+    "manifestRemoved":  true,
+    "tempStateRemoved":  true,
+    "dryRun":  false,
+    "message":  "Migracion completa OK: knowledge/ importado a Engram local y eliminado del proyecto.",
+    "writtenAt":  "2026-05-17T06:34:25.7624998Z"
+}
