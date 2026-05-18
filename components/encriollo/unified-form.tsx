@@ -57,7 +57,7 @@ function writeRateLimitAttempts(attempts: number[]): void {
   localStorage.setItem(RATE_LIMIT_STORAGE_KEY, JSON.stringify(attempts))
 }
 
-function getRateLimitSnapshot(nowMs: number): RateLimitSnapshot {
+function _getRateLimitSnapshot(nowMs: number): RateLimitSnapshot {
   const attempts = readRateLimitAttempts().filter(
     (timestamp) => nowMs - timestamp < RATE_LIMIT_WINDOW_MS,
   )
@@ -75,7 +75,7 @@ function getRateLimitSnapshot(nowMs: number): RateLimitSnapshot {
   return { attempts, blocked: remainingMs > 0, remainingMs }
 }
 
-function formatRemainingTime(remainingMs: number): string {
+function _formatRemainingTime(remainingMs: number): string {
   const totalSeconds = Math.max(0, Math.ceil(remainingMs / 1000))
   const minutes = Math.floor(totalSeconds / 60)
   const seconds = totalSeconds % 60
