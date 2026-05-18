@@ -1,5 +1,6 @@
 param(
-  [switch]$DryRun
+  [switch]$DryRun,
+  [string]$ReportFile
 )
 
 $ErrorActionPreference = "Stop"
@@ -10,6 +11,7 @@ $ErrorActionPreference = "Stop"
 # - Ejecuta secret-scan antes de importar cualquier cosa.
 # - En -DryRun no escribe, no importa y no borra.
 # - En ejecución real crea manifest/estado temporal y los borra si termina OK.
+# - Por defecto muestra el reporte JSON por consola; -ReportFile <path> lo guarda explícitamente.
 
 function Write-Info($m){ Write-Host "[INFO] $m" -ForegroundColor Blue }
 function Write-Ok($m){ Write-Host "[OK] $m" -ForegroundColor Green }
@@ -23,18 +25,11 @@ if (-not $DryRun -and -not (Get-Command engram -ErrorAction SilentlyContinue)) {
 
 $repoDir = if ($env:AGENTES_IA_REPO_DIR) { $env:AGENTES_IA_REPO_DIR } else { (Get-Location).Path }
 $knowledgeDir = Join-Path $repoDir "knowledge"
-$reportFile = Join-Path $repoDir "engram-migration-report.json"
 $manifestFile = Join-Path $repoDir ".engram-migration-manifest.json"
 $tempStateFile = Join-Path $repoDir ".engram-migration-state.json"
 $script:importedCount = 0
 
 function Write-MigrationReport([string]$Status, [int]$Imported, [bool]$Deleted, [string]$Message, [string]$Recommendation = "") {
-  if ($DryRun) {
-    Write-Info "Reporte dry-run: status=$Status imported=$Imported deletedKnowledgeDir=$Deleted message=$Message"
-    if ($Recommendation) { Write-Warn "Acción recomendada: $Recommendation" }
-    return
-  }
-
   $report = [ordered]@{
     status = $Status
     importedCount = $Imported
@@ -42,12 +37,16 @@ function Write-MigrationReport([string]$Status, [int]$Imported, [bool]$Deleted, 
     backupCreated = $false
     manifestRemoved = ($Status -eq 'ok')
     tempStateRemoved = ($Status -eq 'ok')
-    dryRun = $false
+    dryRun = [bool]$DryRun
     message = $Message
     writtenAt = (Get-Date).ToUniversalTime().ToString('o')
   }
   if ($Recommendation) { $report.recommendedAction = $Recommendation }
-  $report | ConvertTo-Json -Depth 5 | Set-Content -Path $reportFile -Encoding UTF8
+  $json = $report | ConvertTo-Json -Depth 5
+  Write-Output $json
+  if ($ReportFile) {
+    $json | Set-Content -Path $ReportFile -Encoding UTF8
+  }
 }
 
 function Remove-Temporaries {

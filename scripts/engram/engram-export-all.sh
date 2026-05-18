@@ -7,6 +7,7 @@ set -euo pipefail
 # - Ejecuta secret-scan antes de importar cualquier cosa.
 # - En --dry-run no escribe, no importa y no borra.
 # - En ejecución real crea manifest/estado temporal y los borra si termina OK.
+# - Por defecto muestra el reporte JSON por consola; --report-file <path> lo guarda explícitamente.
 
 BLUE='\033[0;34m'; GREEN='\033[0;32m'; YELLOW='\033[1;33m'; RED='\033[0;31m'; NC='\033[0m'
 info(){ printf "%b[INFO]%b %s\n" "$BLUE" "$NC" "$1"; }
@@ -15,10 +16,22 @@ warn(){ printf "%b[WARN]%b %s\n" "$YELLOW" "$NC" "$1"; }
 err(){ printf "%b[ERROR]%b %s\n" "$RED" "$NC" "$1"; }
 
 DRY_RUN=0
-for arg in "$@"; do
-  case "$arg" in
-    --dry-run) DRY_RUN=1 ;;
-    *) err "Argumento no soportado: $arg"; exit 2 ;;
+REPORT_FILE=""
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --dry-run)
+      DRY_RUN=1
+      shift
+      ;;
+    --report-file)
+      if [[ $# -lt 2 || -z "${2:-}" ]]; then
+        err "--report-file requiere una ruta."
+        exit 2
+      fi
+      REPORT_FILE="$2"
+      shift 2
+      ;;
+    *) err "Argumento no soportado: $1"; exit 2 ;;
   esac
 done
 
@@ -29,7 +42,6 @@ fi
 
 REPO_DIR="${AGENTES_IA_REPO_DIR:-$(pwd)}"
 KNOWLEDGE_DIR="$REPO_DIR/knowledge"
-REPORT_FILE="$REPO_DIR/engram-migration-report.json"
 MANIFEST_FILE="$REPO_DIR/.engram-migration-manifest.json"
 TEMP_STATE_FILE="$REPO_DIR/.engram-migration-state.json"
 
@@ -40,34 +52,39 @@ fi
 
 write_report() {
   local status="$1" imported="$2" deleted="$3" message="$4" recommendation="${5:-}"
-  if [[ "$DRY_RUN" -eq 1 ]]; then
-    info "Reporte dry-run: status=$status imported=$imported deletedKnowledgeDir=$deleted message=$message"
-    [[ -n "$recommendation" ]] && warn "Acción recomendada: $recommendation"
-    return 0
-  fi
-  python - "$REPORT_FILE" "$status" "$imported" "$deleted" "$message" "$recommendation" <<'PY'
-import json
-import sys
-from datetime import datetime, timezone
+  local manifest_removed="false" temp_state_removed="false" dry_run_json="false"
+  [[ "$status" == "ok" ]] && manifest_removed="true" && temp_state_removed="true"
+  [[ "$DRY_RUN" -eq 1 ]] && dry_run_json="true"
 
-path, status, imported, deleted, message, recommendation = sys.argv[1:]
-report = {
-    "status": status,
-    "importedCount": int(imported),
-    "deletedKnowledgeDir": deleted == "true",
-    "backupCreated": False,
-    "manifestRemoved": status == "ok",
-    "tempStateRemoved": status == "ok",
-    "dryRun": False,
-    "message": message,
-    "writtenAt": datetime.now(timezone.utc).isoformat(),
-}
-if recommendation:
-    report["recommendedAction"] = recommendation
-with open(path, "w", encoding="utf-8") as handle:
-    json.dump(report, handle, ensure_ascii=False, indent=2)
-    handle.write("\n")
-PY
+  json_escape() {
+    # Escapamos caracteres mínimos para emitir JSON válido sin depender de Python/jq.
+    printf '%s' "$1" | sed 's/\\/\\\\/g; s/"/\\"/g; s/\t/\\t/g; s/\r/\\r/g; s/\n/\\n/g'
+  }
+
+  local escaped_message escaped_recommendation written_at report
+  escaped_message="$(json_escape "$message")"
+  escaped_recommendation="$(json_escape "$recommendation")"
+  written_at="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+
+  report="{\n"
+  report+="  \"status\": \"$status\",\n"
+  report+="  \"importedCount\": $imported,\n"
+  report+="  \"deletedKnowledgeDir\": $deleted,\n"
+  report+="  \"backupCreated\": false,\n"
+  report+="  \"manifestRemoved\": $manifest_removed,\n"
+  report+="  \"tempStateRemoved\": $temp_state_removed,\n"
+  report+="  \"dryRun\": $dry_run_json,\n"
+  report+="  \"message\": \"$escaped_message\",\n"
+  report+="  \"writtenAt\": \"$written_at\""
+  if [[ -n "$recommendation" ]]; then
+    report+=",\n  \"recommendedAction\": \"$escaped_recommendation\""
+  fi
+  report+="\n}"
+
+  printf '%b\n' "$report"
+  if [[ -n "$REPORT_FILE" ]]; then
+    printf '%b\n' "$report" > "$REPORT_FILE"
+  fi
 }
 
 cleanup_temporaries() {
