@@ -1,5 +1,4 @@
 claude/agents/code-review.md: 2b68f2911a927f1c37254c0be040db5a
-claude/agents/orchestrator.md: 67ff8a9299321a5545c561f2c058b7c1
 claude/agents/planner.md: efbffdcfb45ec1f5e1d88fc6056aea9e
 claude/agents/react-dev.md: 2de6e5de148345f9aeed52a7777050b9
 claude/agents/security-auditor.md: db2c569f1fec58b86f7dc174962d2214
@@ -11,3 +10,4 @@ claude/skills/react-development/SKILL.md: 60e8e6763036a05403a622dc139025c5
 claude/skills/tailwind-css/SKILL.md: 73ad8a27afe92248857ff35965bd6d0c
 claude/skills/testing-jest/SKILL.md: d31d1463ac4f0cb8740dfb6875e959a3
 claude/skills/typescript-strict/SKILL.md: e3ea58a851fa184b8d7c13ac7e794c99
+claude/agents/orchestrator.md: 377f19c994985bd05a84daee03dc5f93

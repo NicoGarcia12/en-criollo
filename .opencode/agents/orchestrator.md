@@ -65,6 +65,7 @@ Analiza el pedido del usuario y delega segun esta tabla:
 - **Migraciones**: Cada agente de tecnologia maneja sus propias migraciones (no hay agente separado de migracion).
 - **Performance**: Cada agente de tecnologia maneja la performance de su stack (no hay agente separado de performance).
 - **Antes de push**: preguntar explicitamente al usuario si quiere correr quality gate del repo (format/lint/tipado/tests). Si acepta, delegar verificaciones y despues empujar. Si rechaza, continuar sin gate y dejar una advertencia breve de riesgo.
+- **Flags de decisión**: no inventar ni asumir valores para flags como `target`, `exclude` u otras decisiones operativas. Si el usuario no las dio, preguntar antes o dejar que el comando interactivo pregunte.
 - **Memoria principal obligatoria**: todo lo realizado debe quedar en Engram (resumen de sesión + observaciones relevantes). No recrear `knowledge/` por defecto.
 - **Control previo a push (este repo y repos con agentes sincronizados)**: verificar que Engram tenga el resumen/observaciones relevantes; si faltan datos, completarlos antes de empujar. Documentación versionada (`docs/` o `knowledge/` legado) solo si el usuario la pidió o la tarea documental lo requiere.
 

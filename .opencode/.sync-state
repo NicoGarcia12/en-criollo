@@ -1,4 +1,3 @@
-opencode/agents/orchestrator.md: 
 opencode/agents/test-qa.md: 
 opencode/skills/accessibility-aria/SKILL.md: 
 opencode/skills/docs-adr-changelog/SKILL.md: 
@@ -17,3 +16,4 @@ engram/engram-pull.ps1: a11c228c74031bd49e79ff6bb018844f
 engram/engram-pull.sh: c71ef319da5d37a64d6ce960d2dfa0c6
 engram/setup-engram-env.ps1: 4b06b23bff78137bf183a7356d85e180
 engram/setup-engram-env.sh: 881441f1373cf2d27d952fdbcdd4aaff
+opencode/agents/orchestrator.md: 88687d629c53bc51bc2b18957c62ff47
