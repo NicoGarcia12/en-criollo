@@ -4,7 +4,10 @@ Este repo usa un flujo `develop` → `release` → `main`.
 
 ## Trabajo del día a día
 
-Todo el trabajo (features, fixes) se ramifica y mergea contra `develop`. `main` está protegida: nadie puede pushear directo ni mergear sin que exista un Pull Request (no hace falta que nadie lo apruebe, pero sí que exista). Todavía no hay CI configurado en este repo, así que por ahora alcanza con el PR — si en algún momento se agrega CI, conviene sumarlo como check obligatorio acá también.
+Todo el trabajo (features, fixes) se ramifica y mergea contra `develop`. `main` está protegida: nadie puede pushear directo ni mergear sin que:
+
+- Haya un Pull Request (no hace falta que nadie lo apruebe, pero sí que exista).
+- Pase el check de CI: `build` (lint/build/test genérico, agregado por `engram-sync`).
 
 ## Cómo cortar un release
 
